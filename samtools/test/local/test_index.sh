@@ -49,12 +49,10 @@ readonly LOCAL_OUTPUT_NAME=${LOCAL_SCRATCH}/output/${TEST_OUTPUT_FILENAME}
 # BEGIN MAIN EXECUTION
 #
 
-# Create (or empty) the test input/output directories on the host
+# Create the test input/output directories on the host
+rm -rf ${HOST_SCRATCH_DIR}
 mkdir -p ${HOST_SCRATCH_DIR}/input
 mkdir -p ${HOST_SCRATCH_DIR}/output
-
-rm -f ${HOST_SCRATCH_DIR}/input/*
-rm -f ${HOST_SCRATCH_DIR}/output/*
 
 # Pull down the test BAM file
 echo "Copying test file ${TEST_INPUT_FILENAME} to ${HOST_SCRATCH_DIR}"
