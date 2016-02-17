@@ -20,7 +20,7 @@
 # The docker image is assumed to have been tagged with the user id
 # upon creation:
 #
-#   docker build -t ${USER}/samtools
+#   docker build -t ${USER}/samtools PATH/TO/pipelines-api-examples/samtools/Dockerfile
 #
 # This test script will download a small BAM file and run "samtools index"
 # create a BAI file.
