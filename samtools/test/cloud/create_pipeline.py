@@ -16,15 +16,21 @@
 # limitations under the License.
 
 """Python sample demonstrating use of the Google Genomics Pipelines API.
-Demonstrates:
-  * TODO:
+
+This sample demonstrates the definition of a pipeline that will use samtools to create an index file for a BAM.
+
+Specifically it configures:
+  * the passing of one file from Google Cloud Storage as input to the pipeline.
+  * the execution of samtools from within the Docker container.
+  * the copying of the one output file from the pipeline to Google Cloud Storage.
+  * the minimum necessary disk, RAM, and cores.
 """
 
 import pprint
 from oauth2client.client import GoogleCredentials
 from apiclient.discovery import build
 
-PROJECT_ID='**FILL IN PROJECT**'
+PROJECT_ID='**FILL IN PROJECT ID**'
 
 credentials = GoogleCredentials.get_application_default()
 service = build('genomics', 'v1alpha2', credentials=credentials)
