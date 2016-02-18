@@ -16,8 +16,15 @@
 # limitations under the License.
 
 """Python sample demonstrating use of the Google Genomics Pipelines API.
-Demonstrates:
-  * TODO:
+
+This sample demonstrates the invocation of a pipeline that will use samtools to create an index file for a BAM.
+
+Specifically it configures:
+  * which pipeline to run via the pipeline id
+  * which input file from Google Cloud Storage to use as input
+  * the Cloud Storage path to use for the resultant output file
+  * the Cloud Storage path to use for log files for the operation
+  * the project, service account, and scopes with which the operation will run
 """
 
 import pprint
@@ -25,7 +32,7 @@ from oauth2client.client import GoogleCredentials
 from apiclient.discovery import build
 
 PIPELINE_ID='**FILL IN PIPELINE ID**'
-PROJECT_ID='**FILL IN PROJECT**'
+PROJECT_ID='**FILL IN PROJECT ID**'
 SERVICE_ACCOUNT='**FILL IN SERVICE ACCOUNT**'
 BUCKET='**FILL IN BUCKET**'
 
@@ -39,10 +46,10 @@ pipeline = service.pipelines().run(body={
       'inputFile': 'gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06986/alignment/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam'
     },
     'outputs': {
-      'outputFile': 'gs://%s/pipelines/output/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam.bai' % BUCKET
+      'outputFile': 'gs://%s/pipelines-api-examples/samtools/output/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam.bai' % BUCKET
     },
     'logging': {
-      'gcsPath': 'gs://%s/pipelines/logging' % BUCKET
+      'gcsPath': 'gs://%s/pipelines-api-examples/samtools/logging' % BUCKET
     },
     'projectId': PROJECT_ID,
     'serviceAccount': {
