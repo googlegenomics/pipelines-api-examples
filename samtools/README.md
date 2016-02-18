@@ -60,7 +60,7 @@ The output will be the JSON description of the pipeline.
                            u'value': u''}],
   u'parameters': [],
   u'pipelineId': u'YOUR-NEW-PIPELINE-ID',
-  u'projectId': u'elemental-vent-557',
+  u'projectId': u'YOUR-PROJECT-ID',
   u'resources': { u'disks': [ { u'autoDelete': True,
                                 u'mountPoint': u'/mnt/data',
                                 u'name': u'data',
@@ -93,7 +93,7 @@ The output will be the JSON description of the operation.
                  u'clientId': u'',
                  u'createTime': u'2016-02-17T23:51:20.000Z',
                  u'events': [],
-                 u'projectId': u'YOUR-PROEJCT-ID'},
+                 u'projectId': u'YOUR-PROJECT-ID'},
   u'name': u'operations/YOUR-NEW-OPERATION-ID'}
 ```
 

@@ -2,6 +2,8 @@
 
 This repository contains examples for the Pipelines API.
 
+The pipelines API is an easy way to create, run, and monitor command-line tools on Google Compute Engine in a Docker container. You can use it like you would a job scheduler. Input files are copied from a Cloud Storage bucket to a local disk, and output files are copied back to Cloud Storage. You can submit batch operations from your laptop, and have them run in the cloud, using any tools that you can package up with Docker, or that someone has already packaged up and shared.
+
 ## Prerequisites
 
 1. Clone or fork this repository.
