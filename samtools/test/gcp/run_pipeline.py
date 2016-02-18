@@ -24,45 +24,33 @@ import pprint
 from oauth2client.client import GoogleCredentials
 from apiclient.discovery import build
 
+PIPELINE_ID='**FILL IN PIPELINE ID**'
 PROJECT_ID='**FILL IN PROJECT**'
+SERVICE_ACCOUNT='**FILL IN SERVICE ACCOUNT**'
+BUCKET='**FILL IN BUCKET**'
 
 credentials = GoogleCredentials.get_application_default()
 service = build('genomics', 'v1alpha2', credentials=credentials)
 
-pipeline = service.pipelines().create(body={
-  'projectId': PROJECT_ID,
-  'name': 'samtools index',
-  'description': 'Run "samtools index" on a BAM file',
-  'docker' : {
-    'cmd': 'samtools index /mnt/data/input.bam /mnt/data/output.bam.bai',
-    'imageName': 'gcr.io/%s/samtools' % PROJECT_ID
-  },
-  'inputParameters' : [ {
-    'name': 'inputFile',
-    'description': 'GCS path to a BAM to index',
-    'localCopy': {
-      'path': 'input.bam',
-      'disk': 'data'
+pipeline = service.pipelines().run(body={
+  'pipelineId': PIPELINE_ID,
+  'pipelineArgs' : {
+    'inputs': {
+      'inputFile': 'gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06986/alignment/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam'
+    },
+    'outputs': {
+      'outputFile': 'gs://%s/pipelines/output/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam.bai' % BUCKET
+    },
+    'logging': {
+      'gcsPath': 'gs://%s/pipelines/logging' % BUCKET
+    },
+    'projectId': PROJECT_ID,
+    'serviceAccount': {
+        'email': SERVICE_ACCOUNT,
+        'scopes': [
+            'https://www.googleapis.com/auth/cloud-platform'
+        ]
     }
-  } ],
-  'outputParameters' : [ {
-    'name': 'outputFile',
-    'description': 'GCS path for where to write the BAM index',
-    'localCopy': {
-      'path': 'output.bam.bai',
-      'disk': 'data'
-    }
-  } ],
-  'resources' : {
-    'disks': [ {
-      'name': 'data',
-      'autoDelete': True,
-      'mountPoint': '/mnt/data',
-      'sizeGb': 10,
-      'type': 'PERSISTENT_HDD',
-    } ],
-    'minimumCpuCores': 1,
-    'minimumRamGb': 1,
   }
 }).execute()
 
