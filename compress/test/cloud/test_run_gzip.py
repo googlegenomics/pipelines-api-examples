@@ -54,9 +54,11 @@ parser.add_argument("--logging", required=True,
                     help="Cloud Storage path to send logging output")
 args = parser.parse_args()
 
+# Create the genomics service
 credentials = GoogleCredentials.get_application_default()
 service = build('genomics', 'v1alpha2', credentials=credentials)
 
+# Run the pipeline
 pipeline = service.pipelines().run(body={
   'ephemeralPipeline' : {
     'projectId': args.project,
@@ -116,5 +118,6 @@ pipeline = service.pipelines().run(body={
   }
 }).execute()
 
+# Emit the result of the pipeline run submission
 pp = pprint.PrettyPrinter(indent=2)
 pp.pprint(pipeline)
