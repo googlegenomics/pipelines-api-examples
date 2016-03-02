@@ -30,12 +30,15 @@ Usage:
       --disk-size <size-in-gb> \
       --input <gcs-input-path> \
       --output <gcs-output-path> \
-      --logging <gcs-logging-path>
+      --logging <gcs-logging-path> \
+      --poll-interval <interval-in-seconds>
+
+Where the poll-interval is optional (default is no polling).
 """
 
 import argparse
 import pprint
-import sys
+import time
 
 from oauth2client.client import GoogleCredentials
 from apiclient.discovery import build
@@ -52,6 +55,8 @@ parser.add_argument("--output", required=True,
                     help="Cloud Storage path to output file (with the .gz extension)")
 parser.add_argument("--logging", required=True,
                     help="Cloud Storage path to send logging output")
+parser.add_argument("--poll-interval", default=0, type=int,
+                    help="Frequency (in seconds) to poll for completion (default: no polling)")
 args = parser.parse_args()
 
 # Create the genomics service
@@ -59,7 +64,7 @@ credentials = GoogleCredentials.get_application_default()
 service = build('genomics', 'v1alpha2', credentials=credentials)
 
 # Run the pipeline
-pipeline = service.pipelines().run(body={
+operation = service.pipelines().run(body={
   'ephemeralPipeline' : {
     'projectId': args.project,
     'name': 'compress',
@@ -120,4 +125,21 @@ pipeline = service.pipelines().run(body={
 
 # Emit the result of the pipeline run submission
 pp = pprint.PrettyPrinter(indent=2)
-pp.pprint(pipeline)
+pp.pprint(operation)
+
+if args.poll_interval > 0:
+  operation_name = operation['name']
+  print
+  print "Polling for completion of operation"
+
+  while not operation['done']:
+    print "Operation not complete. Sleeping %d seconds" % (args.poll_interval)
+
+    time.sleep(args.poll_interval)
+
+    operation = service.operations().get(name=operation_name).execute()
+
+  print
+  print "Operation complete"
+  print
+  pp.pprint(operation)
