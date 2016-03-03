@@ -79,8 +79,8 @@ operation = service.pipelines().run(body={
     # Define the resources needed for this pipeline.
     'resources' : {
       # Specify default VM parameters for the pipeline
-      'minimumCpuCores': 1,  # TODO: remove this when the API I has a default
-      'minimumRamGb': 3.75, # TODO: remove this when the API I has a default
+      'minimumCpuCores': 1,  # TODO: remove this when the API has a default
+      'minimumRamGb': 3.75, # TODO: remove this when the API has a default
 
       # Create a data disk that is attached to the VM and destroyed when the
       # pipeline terminates.
@@ -94,8 +94,8 @@ operation = service.pipelines().run(body={
         'mountPoint': '/mnt/data',
 
         # Specify a default size and type
-        'sizeGb': 500,            # TODO: remove this when the API I has a default
-        'type': 'PERSISTENT_HDD', # TODO: remove this when the API I has a default
+        'sizeGb': 500,            # TODO: remove this when the API has a default
+        'type': 'PERSISTENT_HDD', # TODO: remove this when the API has a default
       } ],
     },
 
@@ -136,7 +136,6 @@ operation = service.pipelines().run(body={
     } ]
   },
 
-
   'pipelineArgs' : {
     'projectId': args.project,
 
@@ -149,7 +148,7 @@ operation = service.pipelines().run(body={
         'name': 'data',
 
         'sizeGb': args.disk_size,
-        'type': 'PERSISTENT_HDD', # TODO: remove this when the API picks up the default
+        'type': 'PERSISTENT_HDD', # TODO: remove this when the API picks up the pipeline default
       } ]
     },
 
@@ -166,7 +165,7 @@ operation = service.pipelines().run(body={
       'gcsPath': args.logging
     },
 
-    # TODO: remove the service account when defaults are set in the API
+    # TODO: remove this when the API has a default
     'serviceAccount': {
         'email': 'default',
         'scopes': [
