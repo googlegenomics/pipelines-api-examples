@@ -65,14 +65,54 @@ service = build('genomics', 'v1alpha2', credentials=credentials)
 
 # Run the pipeline
 operation = service.pipelines().run(body={
+  # The ephemeralPipeline provides the template for the pipeline
+  # The pipelineArgs provide the inputs specific to this run
+
+  # There are some nuances in the API that are still being ironed out
+  # to make this more compact.
+
   'ephemeralPipeline' : {
     'projectId': args.project,
     'name': 'compress',
     'description': 'Run "gzip" on a file',
-    'docker' : {
-      'cmd': 'gzip /mnt/data/my_file',
-      'imageName': 'ubuntu'
+
+    # Define the resources needed for this pipeline.
+    'resources' : {
+      # Specify default VM parameters for the pipeline
+      'minimumCpuCores': 1,  # TODO: remove this when the API I has a default
+      'minimumRamGb': 3.75, # TODO: remove this when the API I has a default
+
+      # Create a data disk that is attached to the VM and destroyed when the
+      # pipeline terminates.
+      'disks': [ {
+        'name': 'data',
+        'autoDelete': True,
+
+        # Within the docker container, specify a mount point for the disk.
+        # The pipeline input argument below will specify that inputs should be
+        # written to this disk.
+        'mountPoint': '/mnt/data',
+
+        # Specify a default size and type
+        'sizeGb': 500,            # TODO: remove this when the API I has a default
+        'type': 'PERSISTENT_HDD', # TODO: remove this when the API I has a default
+      } ],
     },
+
+    # Specify the docker image to use along with the command
+    'docker' : {
+      'imageName': 'ubuntu', # Stock ubuntu contains the gzip command
+
+      # Compress a file that will be downloaded from Cloud Storage to the data disk. 
+      # The local copy of the file will be named "my_file". See the inputParameters
+      'cmd': 'gzip /mnt/data/my_file',
+    },
+
+    # This example takes a single input parameter - a path to a Cloud Storage file to
+    # be copied to the data disk's mount point (/mnt/data) and name it to "my_file".
+    #
+    # The inputFile specified in the pipelineArgs (see below) specify the
+    # Cloud Storage path to copy to /mnt/data/my_file.
     'inputParameters' : [ {
       'name': 'inputFile',
       'description': 'Cloud Storage path to an uncompressed file ',
@@ -81,6 +121,11 @@ operation = service.pipelines().run(body={
         'disk': 'data'
       }
     } ],
+
+    # gzip compresses in-place, so the output file from gzip is my_file.gz
+    # By specifying an outputParameter, we instruct the pipelines API to
+    # copy /mnt/data/my_file.gz to the Cloud Storage location specified in
+    # the pipelineArgs (see below).
     'outputParameters' : [ {
       'name': 'outputFile',
       'description': 'Cloud Storage path for where to write the compressed result',
@@ -88,30 +133,40 @@ operation = service.pipelines().run(body={
         'path': 'my_file.gz',
         'disk': 'data'
       }
-    } ],
+    } ]
+  },
+
+
+  'pipelineArgs' : {
+    'projectId': args.project,
+
+    # Override the resources needed for this pipeline.
     'resources' : {
+      'minimumRamGb': 1, # For this example, override the 3.75 GB default
+
+      # For the data disk, specify the type and size
       'disks': [ {
         'name': 'data',
-        'autoDelete': True,
-        'mountPoint': '/mnt/data',
+
         'sizeGb': args.disk_size,
-        'type': 'PERSISTENT_HDD',
-      } ],
-      'minimumCpuCores': 1,
-      'minimumRamGb': 1,
-    }
-  },
-  'pipelineArgs' : {
+        'type': 'PERSISTENT_HDD', # TODO: remove this when the API picks up the default
+      } ]
+    },
+
     'inputs': {
+      # Pass the user-specified Cloud Storage path of the file to compress
       'inputFile': args.input
     },
     'outputs': {
+      # Pass the user-specified Cloud Storage destination path of the compressed file
       'outputFile': args.output
     },
     'logging': {
+      # Pass the user-specified Cloud Storage destination for pipeline logging
       'gcsPath': args.logging
     },
-    'projectId': args.project,
+
+    # TODO: remove the service account when defaults are set in the API
     'serviceAccount': {
         'email': 'default',
         'scopes': [
