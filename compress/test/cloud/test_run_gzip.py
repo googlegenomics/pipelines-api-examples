@@ -104,7 +104,7 @@ operation = service.pipelines().run(body={
       'imageName': 'ubuntu', # Stock ubuntu contains the gzip command
 
       # Compress a file that will be downloaded from Cloud Storage to the data disk. 
-      # The local copy of the file will be named "my_file". See the inputParameters
+      # The local copy of the file will be named "my_file". See the inputParameters.
       'cmd': 'gzip /mnt/data/my_file',
     },
 
@@ -122,7 +122,7 @@ operation = service.pipelines().run(body={
       }
     } ],
 
-    # gzip compresses in-place, so the output file from gzip is my_file.gz
+    # gzip compresses in-place, so the output file from gzip is my_file.gz.
     # By specifying an outputParameter, we instruct the pipelines API to
     # copy /mnt/data/my_file.gz to the Cloud Storage location specified in
     # the pipelineArgs (see below).
@@ -139,7 +139,7 @@ operation = service.pipelines().run(body={
   'pipelineArgs' : {
     'projectId': args.project,
 
-    # Override the resources needed for this pipeline.
+    # Override the resources needed for this pipeline
     'resources' : {
       'minimumRamGb': 1, # For this example, override the 3.75 GB default
 
