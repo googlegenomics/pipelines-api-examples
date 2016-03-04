@@ -30,10 +30,10 @@ call to this script (which makes a single call to the Pipelines API).
 
 For small input files, it may make sense to batch them together into a single call.
 Google Compute Engine instance billing is for a minimum of 10 minutes, and then
-per-minute billing after that. So if you are running FastQC over a BAM file for
+per-minute billing after that. If you are running FastQC over a BAM file for
 mitochondrial DNA, it may take less than 10 minutes.
 
-If you have a series of such files, batch them together:
+So if you have a series of such files, batch them together:
 
  --input "gs://bucket/sample1/chrMT.bam gs://bucket/sample1/chrY.bam gs://<etc>"
 

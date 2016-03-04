@@ -181,6 +181,7 @@ operation = service.pipelines().run(body={
 pp = pprint.PrettyPrinter(indent=2)
 pp.pprint(operation)
 
+# If requested - poll until the operation reaches completion state ("done: true")
 if args.poll_interval > 0:
   operation_name = operation['name']
   print
