@@ -8,7 +8,7 @@ docker build -t ${USER}/samtools .
 ```
 ## (2) Test the pipeline locally.
 ```
-./test/local/test_index.sh
+./local/test_index.sh
 ```
 
 The result should be the newly created .bam.bai file in a subdirectory on your local machine:
@@ -34,9 +34,9 @@ gcloud docker push gcr.io/YOUR-PROJECT-ID/samtools
 
 ## (4) Create the pipeline definition.
 
-Edit your copy of [create_pipeline.py](./test/cloud/create_pipeline.py) to specify the id of the Google Cloud Platform project in which the pipeline should be defined and then run the script.
+Edit your copy of [create_pipeline.py](./cloud/create_pipeline.py) to specify the id of the Google Cloud Platform project in which the pipeline should be defined and then run the script.
 ```
-python test/cloud/create_pipeline.py
+python cloud/create_pipeline.py
 ```
 The output will be the JSON description of the pipeline.
 ```
@@ -74,7 +74,7 @@ The output will be the JSON description of the pipeline.
                   u'zones': []}}
 ```
 ## (5) Run the pipeline on the cloud.
-Edit your copy of [run_pipeline.py](./test/cloud/run_pipeline.py) to specify:
+Edit your copy of [run_pipeline.py](./cloud/run_pipeline.py) to specify:
 
   1. the id for the pipeline created in the prior step
   1. the id of the Google Cloud Platform project in which the pipeline should run
@@ -83,7 +83,7 @@ Edit your copy of [run_pipeline.py](./test/cloud/run_pipeline.py) to specify:
 
 and then run the script:
 ```
- python ./test/cloud/run_pipeline.py
+ python ./cloud/run_pipeline.py
 ```
 
 The output will be the JSON description of the operation.
