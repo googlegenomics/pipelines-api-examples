@@ -14,6 +14,7 @@ The pipelines API is an easy way to create, run, and monitor command-line tools 
 ## Examples
 
 * [Use samtools to create a BAM index file](./samtools)
+* [Use Bioconductor to count overlaps in a BAM file](./bioconductor)
 
 ## See Also
 
