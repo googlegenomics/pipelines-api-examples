@@ -1,4 +1,4 @@
-# Use Bioconductor to count overlaps in BAM file
+# Use Bioconductor to count overlaps in a BAM file
 
 This example counts the number of reads overlapping a particular region in the genome.
 
@@ -12,8 +12,8 @@ It emits a one-line TSV file containing the count of overlapping reads and metad
 
 This simplistic example could be extended to:
 
-* run a more interesting Bioconductor analysis on the BAM file
-* loop over for example, all the 1000 Genomes phase 3 BAMs in [gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/\*/high_coverage_alignment/\*.bam](https://console.cloud.google.com/storage/browser/genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/HG00096/high_coverage_alignment/), kicking off the parallel execution of this pipeline on each sample and emitting a distinct output file for each result.
+* Run a more interesting Bioconductor analysis on the BAM file.
+* Loop over, for example, all the 1000 Genomes phase 3 BAMs in [gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/\*/high_coverage_alignment/\*.bam](https://console.cloud.google.com/storage/browser/genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/HG00096/high_coverage_alignment/), kicking off the parallel execution of this pipeline on each sample and emitting a distinct output file for each result.
 
 ## (1) Fetch the Docker container.
 ```
@@ -50,10 +50,10 @@ gsutil cp countOverlapsFromBAM.R gs://YOUR-BUCKET/pipelines-api-examples/biocond
 ## (4) Run the pipeline on the cloud.
 Edit your copy of [run_bioconductor.py](./run_bioconductor.py) to specify:
 
-  1. the id of the Google Cloud Platform project in which the pipeline should run
-  1. the bucket in which the pipeline output file and log files should be placed.
+  1. The id of the Google Cloud Platform project in which the pipeline should run.
+  1. The bucket in which the pipeline output file and log files should be placed.
 
-and then run the script:
+And then run the script:
 ```
  python ./run_bioconductor.py
 ```

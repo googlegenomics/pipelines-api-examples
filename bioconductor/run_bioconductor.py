@@ -20,7 +20,7 @@ This sample demonstrates a pipeline that uses Bioconductor to analyze
 files in Google Cloud Storage.
 
 This pipeline is run in an "ephemeral" manner; no call to pipelines.create()
-is neccessary. No pipeline is persisted in the pipelines list.
+is necessary. No pipeline is persisted in the pipelines list.
 """
 
 import pprint
@@ -37,6 +37,9 @@ PREFIX='pipelines-api-examples/bioconductor'
 
 # Update this path if you uploaded the script elsewhere in Cloud Storage.
 SCRIPT='gs://%s/%s/script.R' % (BUCKET, PREFIX)
+
+# This script will poll for completion of the pipeline.
+POLL_INTERVAL_SECONDS = 20
 
 # Create the genomics service.
 credentials = GoogleCredentials.get_application_default()
@@ -164,7 +167,6 @@ operation = service.pipelines().run(body={
 }).execute()
 
 # Emit the result of the pipeline run submission and poll for completion.
-POLL_INTERVAL = 20
 pp = pprint.PrettyPrinter(indent=2)
 pp.pprint(operation)
 operation_name = operation['name']
@@ -172,8 +174,8 @@ print
 print "Polling for completion of operation"
 
 while not operation['done']:
-  print "Operation not complete. Sleeping %d seconds" % (POLL_INTERVAL)
-  time.sleep(POLL_INTERVAL)
+  print "Operation not complete. Sleeping %d seconds" % (POLL_INTERVAL_SECONDS)
+  time.sleep(POLL_INTERVAL_SECONDS)
   operation = service.operations().get(name=operation_name).execute()
 
 print
