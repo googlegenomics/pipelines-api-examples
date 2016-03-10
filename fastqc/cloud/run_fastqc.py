@@ -199,6 +199,7 @@ operation = service.pipelines().run(body={
       # For the data disk, specify the type and size
       'disks': [ {
         'name': 'datadisk',
+        'autoDelete': True,
 
         'sizeGb': args.disk_size,
         'type': 'PERSISTENT_HDD', # TODO: remove this when the API picks up the pipeline default

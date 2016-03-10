@@ -101,7 +101,7 @@ operation = service.pipelines().run(body={
       # Create a data disk that is attached to the VM and destroyed when the
       # pipeline terminates.
       'disks': [ {
-        'name': 'data',
+        'name': 'datadisk',
         'autoDelete': True,
 
         # Within the docker container, specify a mount point for the disk.
@@ -134,7 +134,7 @@ operation = service.pipelines().run(body={
       'description': 'Cloud Storage path to an uncompressed file',
       'localCopy': {
         'path': 'my_file',
-        'disk': 'data'
+        'disk': 'datadisk'
       }
     } ],
 
@@ -147,7 +147,7 @@ operation = service.pipelines().run(body={
       'description': 'Cloud Storage path for where to write the compressed result',
       'localCopy': {
         'path': 'my_file.gz',
-        'disk': 'data'
+        'disk': 'datadisk'
       }
     } ]
   },
@@ -164,7 +164,8 @@ operation = service.pipelines().run(body={
 
       # For the data disk, specify the type and size
       'disks': [ {
-        'name': 'data',
+        'name': 'datadisk',
+        'autoDelete': True,
 
         'sizeGb': args.disk_size,
         'type': 'PERSISTENT_HDD', # TODO: remove this when the API picks up the pipeline default
