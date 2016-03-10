@@ -7,11 +7,12 @@ push the result to Cloud Storage.
 This pipeline does not involve packaging a custom Docker image, and
 thus there is no requirement to install Docker on your local machine.
 
-## (1) Check the pipeline in the cloud
+## (1) Run the pipeline in the cloud
 
 When the Prerequisites from this repository's [README.md](../README.md)
 are satisfied, then you can run this pipeline as:
 
+```
 PYTHONPATH=.. python ./run_gzip.py \
   --project YOUR-PROJECT-ID \
   --zones "us-*" \
@@ -20,11 +21,12 @@ PYTHONPATH=.. python ./run_gzip.py \
   --output gs://YOUR-BUCKET/compress/output_path/NA12877_S1.genome.vcf.gz \
   --logging gs://YOUR-BUCKET/compress/logging_path \
   --poll-interval 20
+```
 
-Replace YOUR-PROJECT-ID with your project ID.
-Replace YOUR-BUCKET with a bucket in your project.
+* Replace `YOUR-PROJECT-ID` with your project ID.
+* Replace `YOUR-BUCKET` with a bucket in your project.
 
-The PYTHONPATH must include the top-level directory of the
+The `PYTHONPATH` must include the top-level directory of the
 `pipelines-api-examples` in order to pick up modules in the
 [pipelines_pylib](../pipelines_pylib) directory.
 
@@ -38,7 +40,7 @@ be emitted.
                  u'createTime': u'2016-03-10T04:53:28.000Z',
                  u'events': [],
                  u'projectId': u'YOUR-PROJECT-ID'},
-  u'name': u'operations/EJSr_fa1Khi-uuXcpObq_2Igv4HR5oEVKg9wcm9kdWN0aW9uUXVldWU'}
+  u'name': u'operations/YOUR-NEW-OPERATION-ID'}
 
 Polling for completion of operation
 Operation not complete. Sleeping 20 seconds
@@ -114,7 +116,7 @@ Operation complete
 
 ## (2) Check the results
 
-Check the operation output for a top-level field "errors".
+Check the operation output for a top-level `errors` field.
 If none, then the operation should have finished successfully.
 
 Navigate to your bucket in the
