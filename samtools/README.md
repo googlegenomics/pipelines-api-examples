@@ -6,7 +6,7 @@ git clone https://github.com/googlegenomics/pipelines-api-examples.git
 cd pipelines-api-examples/samtools/
 docker build -t ${USER}/samtools .
 ```
-## (2) Test the pipeline locally.
+## (2) Test the Docker image for the pipeline locally.
 ```
 ./local/test_index.sh
 ```

@@ -17,58 +17,32 @@
 
 """Python sample demonstrating use of the Google Genomics Pipelines API.
 
-This sample demonstrates running FASTQC
-(http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) over one
-or more files in Google Cloud Storage.
+This sample demonstrates running a pipeline that invokes a custom user script
+staged in Google Cloud Storage.
 
 This sample demonstrates running the pipeline in an "ephemeral" manner;
 no call to pipelines.create() is necessary. No pipeline is persisted
 in the pipelines list.
 
-For large input files, it will typically make sense to have a single
-call to this script (which makes a single call to the Pipelines API).
-
-For small input files, it may make sense to batch them together into a single call.
-Google Compute Engine instance billing is for a minimum of 10 minutes, and then
-per-minute billing after that. If you are running FastQC over a BAM file for
-mitochondrial DNA, it may take less than 10 minutes.
-
-So if you have a series of such files, batch them together:
-
- --input "gs://bucket/sample1/chrMT.bam gs://bucket/sample1/chrY.bam gs://<etc>"
-
 Usage:
-  * python test_run_gzip.py \
+  * python run_my_script.sh.py \
       --project <project-id> \
-      --zones <gce-zones> \
       --disk-size <size-in-gb> \
+      --script <gcs-script-path> \
       --input <gcs-input-path> \
       --output <gcs-output-path> \
       --logging <gcs-logging-path> \
       --poll-interval <interval-in-seconds>
 
 Where the poll-interval is optional (default is no polling).
-
-Users will typically want to restrict the Compute Engine zones to avoid Cloud
-Storage egress charges. This script supports a short-hand pattern-matching
-for specifying zones, such as:
-
-  --zones "*"                # All zones
-  --zones "us-*"             # All US zones
-  --zones "us-central1-*"    # All us-central1 zones
-
-an explicit list may be specified, space-separated:
-  --zones us-central1-a us-central1-b
 """
 
 import argparse
 import pprint
+import time
 
 from oauth2client.client import GoogleCredentials
 from apiclient.discovery import build
-
-from pipelines_pylib import defaults
-from pipelines_pylib import poller
 
 # Parse input args
 parser = argparse.ArgumentParser()
@@ -76,10 +50,8 @@ parser.add_argument("--project", required=True,
                     help="Cloud project id to run the pipeline in")
 parser.add_argument("--disk-size", required=True, type=int,
                     help="Size (in GB) of disk for both input and output")
-parser.add_argument("--zones", required=True, nargs="+",
-                    help="List of Google Compute Engine zones (supports wildcards)")
-parser.add_argument("--input", required=True, nargs="+",
-                    help="Cloud Storage path to input file(s)")
+parser.add_argument("--input", required=True,
+                    help="Cloud Storage path to input file")
 parser.add_argument("--output", required=True,
                     help="Cloud Storage path to output file (with the .gz extension)")
 parser.add_argument("--logging", required=True,
@@ -102,8 +74,8 @@ operation = service.pipelines().run(body={
 
   'ephemeralPipeline' : {
     'projectId': args.project,
-    'name': 'fastqc',
-    'description': 'Run "FastQC" on one or more files',
+    'name': 'compress',
+    'description': 'Run "gzip" on a file',
 
     # Define the resources needed for this pipeline.
     'resources' : {
@@ -114,7 +86,7 @@ operation = service.pipelines().run(body={
       # Create a data disk that is attached to the VM and destroyed when the
       # pipeline terminates.
       'disks': [ {
-        'name': 'datadisk',
+        'name': 'data',
         'autoDelete': True,
 
         # Within the docker container, specify a mount point for the disk.
@@ -130,58 +102,37 @@ operation = service.pipelines().run(body={
 
     # Specify the docker image to use along with the command
     'docker' : {
-      'imageName': 'gcr.io/%s/fastqc' % args.project,
+      'imageName': 'ubuntu', # Stock ubuntu contains the gzip command
 
-      # The Pipelines API will create the input directory when localizing files,
-      # but does not create the output directory.
-      'cmd': ('mkdir /mnt/data/output && '
-              'fastqc /mnt/data/input/* --outdir=/mnt/data/output/'),
+      # Compress a file that will be downloaded from Cloud Storage to the data disk. 
+      # The local copy of the file will be named "my_file". See the inputParameters.
+      'cmd': 'gzip /mnt/data/my_file',
     },
 
-    # The Pipelines API currently supports full GCS paths, along with patterns (globs),
-    # but it doesn't directly support a list of files being passed as a single input
-    # parameter ("gs://bucket/foo.bam gs://bucket/bar.bam").
+    # This example takes a single input parameter - a path to a Cloud Storage file to
+    # be copied to the data disk's mount point (/mnt/data) and name it to "my_file".
     #
-    # We can simply generate a series of inputs (input0, input1, etc.) to support this here.
-    #
-    # 'inputParameters' : [ {
-    #   'name': 'inputFile0',
-    #   'description': 'Cloud Storage path to an input file',
-    #   'localCopy': {
-    #     'path': 'input/',
-    #     'disk': 'datadisk'
-    #   }
-    # }, {
-    #   'name': 'inputFile1',
-    #   'description': 'Cloud Storage path to an input file',
-    #   'localCopy': {
-    #     'path': 'input/',
-    #     'disk': 'datadisk'
-    #   }
-    # <etc>
-    # } ],
-
-    # The inputFile<n> specified in the pipelineArgs (see below) will specify the
-    # Cloud Storage path to copy to /mnt/data/input/.
-
+    # The inputFile specified in the pipelineArgs (see below) specify the
+    # Cloud Storage path to copy to /mnt/data/my_file.
     'inputParameters' : [ {
-      'name': 'inputFile%d' % idx,
-      'description': 'Cloud Storage path to an input file',
+      'name': 'inputFile',
+      'description': 'Cloud Storage path to an uncompressed file',
       'localCopy': {
-        'path': 'input/',
-        'disk': 'datadisk'
+        'path': 'my_file',
+        'disk': 'data'
       }
-    } for idx in range(len(args.input)) ],
+    } ],
 
+    # gzip compresses in-place, so the output file from gzip is my_file.gz.
     # By specifying an outputParameter, we instruct the pipelines API to
-    # copy /mnt/data/output/* to the Cloud Storage location specified in
+    # copy /mnt/data/my_file.gz to the Cloud Storage location specified in
     # the pipelineArgs (see below).
     'outputParameters' : [ {
-      'name': 'outputPath',
-      'description': 'Cloud Storage path for where to FastQC output',
+      'name': 'outputFile',
+      'description': 'Cloud Storage path for where to write the compressed result',
       'localCopy': {
-        'path': 'output/*',
-        'disk': 'datadisk'
+        'path': 'my_file.gz',
+        'disk': 'data'
       }
     } ]
   },
@@ -193,35 +144,25 @@ operation = service.pipelines().run(body={
     'resources' : {
       'minimumRamGb': 1, # For this example, override the 3.75 GB default
 
-      # Expand any zone short-hand patterns
-      'zones': defaults.get_zones(args.zones),
-
       # For the data disk, specify the type and size
       'disks': [ {
-        'name': 'datadisk',
+        'name': 'data',
 
         'sizeGb': args.disk_size,
         'type': 'PERSISTENT_HDD', # TODO: remove this when the API picks up the pipeline default
       } ]
     },
 
-    # Pass the user-specified Cloud Storage paths as a map of input files
-    # 'inputs' : {
-    #   'inputFile0' : 'gs://bucket/foo.bam',
-    #   'inputFile1' : 'gs://bucket/bar.bam', 
-    #   <etc>
-    # }
-    'inputs' : {
-      'inputFile%d' % idx : value for idx, value in enumerate(args.input)
+    'inputs': {
+      # Pass the user-specified Cloud Storage path of the file to compress
+      'inputFile': args.input
     },
-
-    # Pass the user-specified Cloud Storage destination path of the FastQC output
-    'outputs' : {
-      'outputPath': args.output
+    'outputs': {
+      # Pass the user-specified Cloud Storage destination path of the compressed file
+      'outputFile': args.output
     },
-
-    # Pass the user-specified Cloud Storage destination for pipeline logging
     'logging': {
+      # Pass the user-specified Cloud Storage destination for pipeline logging
       'gcsPath': args.logging
     },
 
@@ -241,7 +182,19 @@ operation = service.pipelines().run(body={
 pp = pprint.PrettyPrinter(indent=2)
 pp.pprint(operation)
 
-# If requested - poll until the operation reaches completion state ("done: true")
 if args.poll_interval > 0:
-  completed_op = poller.poll(service, operation, args.poll_interval)
-  pp.pprint(completed_op)
+  operation_name = operation['name']
+  print
+  print "Polling for completion of operation"
+
+  while not operation['done']:
+    print "Operation not complete. Sleeping %d seconds" % (args.poll_interval)
+
+    time.sleep(args.poll_interval)
+
+    operation = service.operations().get(name=operation_name).execute()
+
+  print
+  print "Operation complete"
+  print
+  pp.pprint(operation)
