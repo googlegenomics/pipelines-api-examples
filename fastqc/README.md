@@ -6,7 +6,7 @@ git clone https://github.com/googlegenomics/pipelines-api-examples.git
 cd pipelines-api-examples/fastqc/
 docker build -t ${USER}/fastqc .
 ```
-## (2) Test the Docker image for the pipeline locally.
+## (2) Test locally the Docker image used by the pipeline.
 ```
 ./local/test_fastqc.sh
 ```
