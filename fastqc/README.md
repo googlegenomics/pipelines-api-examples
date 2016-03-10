@@ -124,7 +124,7 @@ Operation complete
                                                   u'logging': { u'gcsPath': u'gs://YOUR-BUCKET/fastqc/logging'},
                                                   u'outputs': { u'outputPath': u'gs://YOUR-BUCKET/fastqc/output'},
                                                   u'projectId': u'YOUR-PROJECT-ID',
-                                                  u'resources': { u'disks': [ { u'autoDelete': False,
+                                                  u'resources': { u'disks': [ { u'autoDelete': True,
                                                                                 u'mountPoint': u'',
                                                                                 u'name': u'datadisk',
                                                                                 u'readOnly': False,
