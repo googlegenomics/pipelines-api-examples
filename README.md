@@ -32,10 +32,10 @@ You can do the packaging to Docker yourself, or use existing Docker images.
 
 ## Examples
 
-* [Use Bioconductor to count overlaps in a BAM file](./bioconductor)
 * [Compress a file](./compress)
 * [Run FastQC over a list of BAM or FASTQ files](./fastqc)
 * [Use samtools to create a BAM index file](./samtools)
+* [Use Bioconductor to count overlaps in a BAM file](./bioconductor)
 
 ## See Also
 
