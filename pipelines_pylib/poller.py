@@ -24,7 +24,7 @@ def poll(service, operation, poll_interval):
       service: genomics service endpoint
       operation: operation object for the operation to poll
       poll_interval: polling interval (in seconds).
-  
+
   Returns:
       The operation object when it has been marked "done".
   """

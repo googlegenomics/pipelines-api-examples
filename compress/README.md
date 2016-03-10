@@ -6,6 +6,9 @@ push the result to Cloud Storage.
 
 This pipeline does not involve packaging a custom Docker image, and
 thus there is no requirement to install Docker on your local machine.
+
+## (1) Check the pipeline in the cloud
+
 When the Prerequisites from this repository's [README.md](../README.md)
 are satisfied, then you can run this pipeline as:
 
@@ -109,7 +112,7 @@ Operation complete
 
 ```
 
-## (5) Check the results
+## (2) Check the results
 
 Check the operation output for a top-level field "errors".
 If none, then the operation should have finished successfully.
