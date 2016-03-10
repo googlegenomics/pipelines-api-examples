@@ -42,7 +42,7 @@ gcloud docker push gcr.io/YOUR-PROJECT-ID/fastqc
 ```
 
 ## (4) Run the Docker image in the cloud
-
+```
 PYTHONPATH=.. python cloud/run_fastqc.py \
   --project YOUR-PROJECT-ID \
   --zones us-* \
@@ -55,10 +55,10 @@ PYTHONPATH=.. python cloud/run_fastqc.py \
   --poll-interval 20
 ```
 
-Replace YOUR-PROJECT-ID with your project ID.
-Replace YOUR-BUCKET with a bucket in your project.
+* Replace `YOUR-PROJECT-ID` with your project ID.
+* Replace `YOUR-BUCKET` with a bucket in your project.
 
-The PYTHONPATH must include the top-level directory of the
+The `PYTHONPATH` must include the top-level directory of the
 `pipelines-api-examples` in order to pick up modules in the
 [pipelines_pylib](../pipelines_pylib) directory.
 
@@ -148,7 +148,7 @@ Operation complete
 
 ## (5) Check the results
 
-Check the operation output for a top-level field "errors".
+Check the operation output for a top-level `erors` field.
 If none, then the operation should have finished successfully.
 
 Navigate to your bucket in the
