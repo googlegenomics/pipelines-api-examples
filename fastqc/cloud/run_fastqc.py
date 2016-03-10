@@ -40,6 +40,7 @@ So if you have a series of such files, batch them together:
 Usage:
   * python test_run_gzip.py \
       --project <project-id> \
+      --zones <gce-zones> \
       --disk-size <size-in-gb> \
       --input <gcs-input-path> \
       --output <gcs-output-path> \
@@ -47,14 +48,27 @@ Usage:
       --poll-interval <interval-in-seconds>
 
 Where the poll-interval is optional (default is no polling).
+
+Users will typically want to restrict the Compute Engine zones to avoid Cloud
+Storage egress charges. This script supports a short-hand pattern-matching
+for specifying zones, such as:
+
+  --zones "*"                # All zones
+  --zones "us-*"             # All US zones
+  --zones "us-central1-*"    # All us-central1 zones
+
+an explicit list may be specified, space-separated:
+  --zones us-central1-a us-central1-b
 """
 
 import argparse
 import pprint
-import time
 
 from oauth2client.client import GoogleCredentials
 from apiclient.discovery import build
+
+from pipelines_pylib import defaults
+from pipelines_pylib import poller
 
 # Parse input args
 parser = argparse.ArgumentParser()
@@ -62,6 +76,8 @@ parser.add_argument("--project", required=True,
                     help="Cloud project id to run the pipeline in")
 parser.add_argument("--disk-size", required=True, type=int,
                     help="Size (in GB) of disk for both input and output")
+parser.add_argument("--zones", required=True, nargs="+",
+                    help="List of Google Compute Engine zones (supports wildcards)")
 parser.add_argument("--input", required=True, nargs="+",
                     help="Cloud Storage path to input file(s)")
 parser.add_argument("--output", required=True,
@@ -177,9 +193,13 @@ operation = service.pipelines().run(body={
     'resources' : {
       'minimumRamGb': 1, # For this example, override the 3.75 GB default
 
+      # Expand any zone short-hand patterns
+      'zones': defaults.get_zones(args.zones),
+
       # For the data disk, specify the type and size
       'disks': [ {
         'name': 'datadisk',
+        'autoDelete': True,
 
         'sizeGb': args.disk_size,
         'type': 'PERSISTENT_HDD', # TODO: remove this when the API picks up the pipeline default
@@ -224,18 +244,5 @@ pp.pprint(operation)
 
 # If requested - poll until the operation reaches completion state ("done: true")
 if args.poll_interval > 0:
-  operation_name = operation['name']
-  print
-  print "Polling for completion of operation"
-
-  while not operation['done']:
-    print "Operation not complete. Sleeping %d seconds" % (args.poll_interval)
-
-    time.sleep(args.poll_interval)
-
-    operation = service.operations().get(name=operation_name).execute()
-
-  print
-  print "Operation complete"
-  print
-  pp.pprint(operation)
+  completed_op = poller.poll(service, operation, args.poll_interval)
+  pp.pprint(completed_op)
