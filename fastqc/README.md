@@ -59,7 +59,7 @@ Replace YOUR-PROJECT-ID with your project ID.
 Replace YOUR-BUCKET with a bucket in your project.
 
 The PYTHONPATH must include the top-level directory of the
-``pipelines-api-examples`` in order to pick up modules in the
+`pipelines-api-examples` in order to pick up modules in the
 [pipelines_pylib](../pipelines_pylib) directory.
 
 The output will be the JSON description of the operation, followed by periodic

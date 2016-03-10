@@ -1,6 +1,6 @@
 # Compress a file from Cloud Storage
 
-This pipeline uses gzip command in the default ``ubuntu`` image to
+This pipeline uses gzip command in the default `ubuntu` image to
 allow you to download a file from Cloud Storage, compress it, and
 push the result to Cloud Storage.
 
@@ -22,7 +22,7 @@ Replace YOUR-PROJECT-ID with your project ID.
 Replace YOUR-BUCKET with a bucket in your project.
 
 The PYTHONPATH must include the top-level directory of the
-``pipelines-api-examples`` in order to pick up modules in the
+`pipelines-api-examples` in order to pick up modules in the
 [pipelines_pylib](../pipelines_pylib) directory.
 
 The output will be the JSON description of the operation, followed by periodic
