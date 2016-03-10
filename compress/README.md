@@ -1,8 +1,8 @@
 # Compress a file from Cloud Storage
 
-This pipeline uses gzip command in the default `ubuntu` image to
-allow you to download a file from Cloud Storage, compress it, and
-push the result to Cloud Storage.
+This pipeline provides the use-case of downloading a file from Cloud Storage,
+compressing it via gzip, and pushing the result to Cloud Storage.
+The gzip command is provided as part of the default `ubuntu` image.
 
 This pipeline does not involve packaging a custom Docker image, and
 thus there is no requirement to install Docker on your local machine.
