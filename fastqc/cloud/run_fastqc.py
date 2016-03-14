@@ -38,7 +38,7 @@ So if you have a series of such files, batch them together:
  --input "gs://bucket/sample1/chrMT.bam gs://bucket/sample1/chrY.bam gs://<etc>"
 
 Usage:
-  * python test_run_gzip.py \
+  * python run_fastqc.py \
       --project <project-id> \
       --zones <gce-zones> \
       --disk-size <size-in-gb> \
