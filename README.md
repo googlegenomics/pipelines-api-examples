@@ -27,7 +27,11 @@ You can do the packaging to Docker yourself, or use existing Docker images.
 
 1. Clone or fork this repository.
 1. If you plan to create your own Docker images, then install docker: https://docs.docker.com/engine/installation/#installation
-1. If you have not already done so, follow the Google Genomics [getting started instructions](https://cloud.google.com/genomics/install-genomics-tools) to set up your environment including [installing gcloud](https://cloud.google.com/sdk/) and running `gcloud init`.
+1. Follow the Google Genomics [getting started instructions](https://cloud.google.com/genomics/install-genomics-tools#create-project-and-authenticate) to set up your Google Cloud Project. The Pipelines API requires that the following are enabled in your project:
+    1. [Genomics API](https://console.cloud.google.com/project/_/apis/api/genomics)
+    2. [Cloud Storage API](https://console.cloud.google.com/project/_/apis/api/storage_api)
+    3. [Compute Engine API](https://console.cloud.google.com/project/_/apis/api/compute_component)
+1. Follow the Google Genomics [getting started instructions](https://cloud.google.com/genomics/install-genomics-tools#install-genomics-tools) to install and authorize the Google Cloud SDK.
 1. Install or update the python client via `pip install --upgrade google-api-python-client`.  For more detail see https://cloud.google.com/genomics/v1/libraries.
 
 ## Examples

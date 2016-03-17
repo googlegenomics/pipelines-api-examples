@@ -94,10 +94,6 @@ operation = service.pipelines().run(body={
 
     # Define the resources needed for this pipeline.
     'resources' : {
-      # Specify default VM parameters for the pipeline
-      'minimumCpuCores': 1,  # TODO: remove this when the API has a default
-      'minimumRamGb': 3.75, # TODO: remove this when the API has a default
-
       # Create a data disk that is attached to the VM and destroyed when the
       # pipeline terminates.
       'disks': [ {
@@ -108,10 +104,6 @@ operation = service.pipelines().run(body={
         # The pipeline input argument below will specify that inputs should be
         # written to this disk.
         'mountPoint': '/mnt/data',
-
-        # Specify a default size and type
-        'sizeGb': 500,            # TODO: remove this when the API has a default
-        'type': 'PERSISTENT_HDD', # TODO: remove this when the API has a default
       } ],
     },
 
@@ -157,8 +149,6 @@ operation = service.pipelines().run(body={
 
     # Override the resources needed for this pipeline
     'resources' : {
-      'minimumRamGb': 1, # For this example, override the 3.75 GB default
-
       # Expand any zone short-hand patterns
       'zones': defaults.get_zones(args.zones),
 
@@ -168,7 +158,6 @@ operation = service.pipelines().run(body={
         'autoDelete': True,
 
         'sizeGb': args.disk_size,
-        'type': 'PERSISTENT_HDD', # TODO: remove this when the API picks up the pipeline default
       } ]
     },
 
@@ -184,16 +173,6 @@ operation = service.pipelines().run(body={
       # Pass the user-specified Cloud Storage destination for pipeline logging
       'gcsPath': args.logging
     },
-
-    # TODO: remove this when the API has a default
-    'serviceAccount': {
-        'email': 'default',
-        'scopes': [
-            'https://www.googleapis.com/auth/compute',
-            'https://www.googleapis.com/auth/devstorage.full_control',
-            'https://www.googleapis.com/auth/genomics'
-        ]
-    }
   }
 }).execute()
 
