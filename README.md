@@ -3,6 +3,10 @@
 This repository contains examples for the [Google Genomics Pipelines API]
 (https://cloud.google.com/genomics/reference/rest/v1alpha2/pipelines).
 
+| Alpha |
+|-------|
+| This is an Alpha release of Google Genomics API. This feature might be changed in backward-incompatible ways and is not recommended for production use. It is not subject to any SLA or deprecation policy. |
+
 The API provides an easy way to create, run, and monitor command-line tools
 on Google Compute Engine running in a Docker container. You can use it like
 you would a job scheduler.
