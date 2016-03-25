@@ -18,18 +18,16 @@ and you want it to look like:
 ```
 
 The scripts in this example can be used to make this change to a set of VCFs.
-The input VCFs can be uncompressed or compressed with gzip or bzip2.
-The output VCFs compression will reflect the input VCFs.
+The input VCFs can be compressed with gzip or bzip2 or they can be uncompressed.
+The output VCFs' compression state will reflect the input VCFs'.
 
-This example also demonstrates using the Pipelines API to run custom code,
-but without building a Docker image. In this example, the scripts are copied
-into Cloud Storage and then downloaded at pipeline run time.
-The docker image used is stock
-[Python 2.7 image from dockerhub](https://hub.docker.com/_/python/).
+| API Note |
+|----------|
+| This example demonstrates using the Pipelines API to run custom code *without building a Docker image*. In this example, the scripts are copied into Cloud Storage and then downloaded at pipeline run time.  The docker image used is the stock [Python 2.7 image from dockerhub](https://hub.docker.com/_/python/). |
 
-This example also demonstrates the use of non-file input parameters.
-These parameters (ORIGINAL_SAMPLE_ID and NEW_SAMPLE_ID) get set in the
-environment and are then available to the code running in the docker container.
+| API Note |
+|----------|
+| This example demonstrates the use of non-file input parameters. These parameters (`ORIGINAL_SAMPLE_ID` and `NEW_SAMPLE_ID`) get set in the environment and are then available to the code running in the docker container. |
 
 ## (1) Copy scripts to Cloud Storage
 
@@ -37,6 +35,8 @@ environment and are then available to the code running in the docker container.
 gsutil cp set_vcf_sample_id.sh differ.py \
   gs://YOUR-BUCKET/pipelines/set_vcf_sample_id/
 ```
+
+* Replace `YOUR-PROJECT-ID` with your project ID.
 
 ## (2) Launch the Pipeline
 
@@ -168,9 +168,11 @@ $ gsutil ls -l gs://YOUR-BUCKET/set_vcf_sample_id/output
   29014774  2016-03-25T22:19:47Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140404.snps_v2.vcf.gz
      31103  2016-03-25T22:19:45Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140404.svs_v2.vcf.gz
 TOTAL: 5 objects, 68507651 bytes (65.33 MiB)
+```
 
 ## (5) Check the header in the output
 
+```
 $ gsutil cat gs://YOUR-BUCKET/set_vcf_sample_id/output/* \
  | zcat \
  | grep ^#CHROM
@@ -179,4 +181,4 @@ $ gsutil cat gs://YOUR-BUCKET/set_vcf_sample_id/output/* \
 #CHROM  POS ID  REF ALT QUAL  FILTER  INFO  FORMAT  NA12878-NEW
 #CHROM  POS ID  REF ALT QUAL  FILTER  INFO  FORMAT  NA12878-NEW
 #CHROM  POS ID  REF ALT QUAL  FILTER  INFO  FORMAT  NA12878-NEW
-
+```
