@@ -45,7 +45,7 @@ gcloud docker push gcr.io/YOUR-PROJECT-ID/fastqc
 ```
 PYTHONPATH=.. python cloud/run_fastqc.py \
   --project YOUR-PROJECT-ID \
-  --zones us-* \
+  --zones "us-*" \
   --disk-size 100 \
   --input \
     gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06986/alignment/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam \
@@ -148,7 +148,7 @@ Operation complete
 
 ## (5) Check the results
 
-Check the operation output for a top-level `erors` field.
+Check the operation output for a top-level `errors` field.
 If none, then the operation should have finished successfully.
 
 Navigate to your bucket in the
