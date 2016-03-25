@@ -36,7 +36,7 @@ gsutil cp set_vcf_sample_id.sh differ.py \
   gs://YOUR-BUCKET/pipelines/set_vcf_sample_id/
 ```
 
-* Replace `YOUR-PROJECT-ID` with your project ID.
+* Replace `YOUR-BUCKET` with a bucket in your project.
 
 ## (2) Launch the Pipeline
 
