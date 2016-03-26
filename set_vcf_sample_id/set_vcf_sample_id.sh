@@ -91,7 +91,7 @@ declare -i COUNT=0
 declare -i SKIPPED=0
 declare -i UPDATED=0
 
-declare START=$(date +%s)
+readonly START=$(date +%s)
 for FILE in ${INPUT_PATH}; do
   # Check if the input file is compressed.
   # We'll need to decompress it for processing and then compress the output.
@@ -137,7 +137,7 @@ for FILE in ${INPUT_PATH}; do
 
   COUNT=$((COUNT + 1))
 done
-declare END=$(date +%s)
+readonly END=$(date +%s)
 
 log ""
 log "Updated: ${UPDATED}"
