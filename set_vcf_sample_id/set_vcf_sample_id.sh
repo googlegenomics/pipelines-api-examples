@@ -87,11 +87,11 @@ log "END: log runtime details"
 
 # Process the input files
 
-COUNT=0
-SKIPPED=0
-UPDATED=0
+declare -i COUNT=0
+declare -i SKIPPED=0
+declare -i UPDATED=0
 
-START=$(date +%s)
+declare START=$(date +%s)
 for FILE in ${INPUT_PATH}; do
   # Check if the input file is compressed.
   # We'll need to decompress it for processing and then compress the output.
@@ -137,7 +137,7 @@ for FILE in ${INPUT_PATH}; do
 
   COUNT=$((COUNT + 1))
 done
-END=$(date +%s)
+declare END=$(date +%s)
 
 log ""
 log "Updated: ${UPDATED}"
