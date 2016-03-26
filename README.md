@@ -43,6 +43,7 @@ You can do the packaging to Docker yourself, or use existing Docker images.
 * [Compress a file](./compress)
 * [Run FastQC over a list of BAM or FASTQ files](./fastqc)
 * [Use samtools to create a BAM index file](./samtools)
+* [Use a custom script in Cloud Storage to update a VCF header](./set_vcf_sample_id)
 * [Use Bioconductor to count overlaps in a BAM file](./bioconductor)
 
 ## See Also
