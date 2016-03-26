@@ -32,7 +32,7 @@ The output VCFs' compression state will reflect the input VCFs'.
 ## (1) Copy scripts to Cloud Storage
 
 ```
-gsutil cp set_vcf_sample_id.sh differ.py \
+gsutil cp set_vcf_sample_id.sh set_vcf_sample_id.py \
   gs://YOUR-BUCKET/pipelines/set_vcf_sample_id/
 ```
 
@@ -64,13 +64,14 @@ The `PYTHONPATH` must include the top-level directory of the
 The output will be the JSON description of the operation, followed by periodic
 messages for polling. When the operation completes, the full operation will
 be emitted.
+
 ```
 { u'done': False,
   u'metadata': { u'@type': u'type.googleapis.com/google.genomics.v1.OperationMetadata',
                  u'clientId': u'',
-                 u'createTime': u'2016-03-25T22:16:26.000Z',
+                 u'createTime': u'2016-03-26T20:23:16.000Z',
                  u'events': [],
-                 u'projectId': u'YOUR-PROJECT'},
+                 u'projectId': u'YOUR-PROJECT-ID'},
   u'name': u'operations/YOUR-NEW-OPERATION-ID'}
 
 Polling for completion of operation
@@ -84,39 +85,39 @@ Operation complete
 { u'done': True,
   u'metadata': { u'@type': u'type.googleapis.com/google.genomics.v1.OperationMetadata',
                  u'clientId': u'',
-                 u'createTime': u'2016-03-25T22:16:26.000Z',
-                 u'endTime': u'2016-03-25T22:19:50.000Z',
+                 u'createTime': u'2016-03-26T20:23:16.000Z',
+                 u'endTime': u'2016-03-26T20:26:34.000Z',
                  u'events': [ { u'description': u'start',
-                                u'startTime': u'2016-03-25T22:17:38.796730133Z'},
+                                u'startTime': u'2016-03-26T20:24:23.037434420Z'},
                               { u'description': u'pulling-image',
-                                u'startTime': u'2016-03-25T22:17:38.796805264Z'},
+                                u'startTime': u'2016-03-26T20:24:23.037517871Z'},
                               { u'description': u'localizing-files',
-                                u'startTime': u'2016-03-25T22:18:08.830199428Z'},
+                                u'startTime': u'2016-03-26T20:24:53.813765964Z'},
                               { u'description': u'running-docker',
-                                u'startTime': u'2016-03-25T22:18:18.508789255Z'},
+                                u'startTime': u'2016-03-26T20:25:01.034948524Z'},
                               { u'description': u'delocalizing-files',
-                                u'startTime': u'2016-03-25T22:19:43.563854558Z'},
+                                u'startTime': u'2016-03-26T20:26:05.086924619Z'},
                               { u'description': u'ok',
-                                u'startTime': u'2016-03-25T22:19:49.778866602Z'}],
-                 u'projectId': u'YOUR-PROJECT',
+                                u'startTime': u'2016-03-26T20:26:34.544887148Z'}],
+                 u'projectId': u'YOUR-PROJECT-ID',
                  u'request': { u'@type': u'type.googleapis.com/google.genomics.v1alpha2.RunPipelineRequest',
                                u'ephemeralPipeline': { u'description': u'Set the sample ID in a VCF header',
-                                                       u'docker': { u'cmd': u'mkdir /mnt/data/output && export SCRIPT_DIR=/mnt/data/scripts && chmod u+x ${SCRIPT_DIR}/* && ${SCRIPT_DIR}/set_vcf_sample_id.sh "${ORIGINAL_SAMPLE_ID}" "${NEW_SAMPLE_ID}" "/mnt/data/input/*" "/mnt/data/output"',
+                                                       u'docker': { u'cmd': u'mkdir /mnt/data/output && export SCRIPT_DIR=/mnt/data/scripts && chmod u+x ${SCRIPT_DIR}/* && ${SCRIPT_DIR}/set_vcf_sample_id.sh "${ORIGINAL_SAMPLE_ID:-}" "${NEW_SAMPLE_ID}" "/mnt/data/input/*" "/mnt/data/output"',
                                                                     u'imageName': u'python:2.7'},
                                                        u'name': u'set_vcf_sample_id',
                                                        u'parameters': [ { u'description': u'Cloud Storage path to input file(s)',
                                                                           u'name': u'inputFile0'},
                                                                         { u'description': u'Cloud Storage path to set_vcf_sample_id.sh script',
                                                                           u'name': u'setVcfSampleId_Script'},
-                                                                        { u'description': u'Cloud Storage path to differ.py script',
-                                                                          u'name': u'differ_Script'},
-                                                                        { u'description': u'ID which must already appear in the VCF (default "none")',
+                                                                        { u'description': u'Cloud Storage path to set_vcf_sample_id.py script',
+                                                                          u'name': u'setVcfSampleId_Python'},
+                                                                        { u'description': u'Sample ID which must already appear in the VCF header',
                                                                           u'name': u'ORIGINAL_SAMPLE_ID'},
-                                                                        { u'description': u'New ID to set in the VCF header',
+                                                                        { u'description': u'New sample ID to set in the VCF header',
                                                                           u'name': u'NEW_SAMPLE_ID'},
                                                                         { u'description': u'Cloud Storage path for where to copy the output',
                                                                           u'name': u'outputPath'}],
-                                                       u'projectId': u'YOUR-PROJECT',
+                                                       u'projectId': u'YOUR-PROJECT-ID',
                                                        u'resources': { u'disks': [ { u'autoDelete': True,
                                                                                      u'name': u'datadisk'}]}},
                                u'pipelineArgs': { u'clientId': u'',
@@ -125,7 +126,7 @@ Operation complete
                                                                u'inputFile0': u'gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/working/20140123_NA12878_Illumina_Platinum/**.vcf.gz'},
                                                   u'logging': { u'gcsPath': u'gs://YOUR-BUCKET/set_vcf_sample_id/logging'},
                                                   u'outputs': { u'outputPath': u'gs://YOUR-BUCKET/set_vcf_sample_id/output'},
-                                                  u'projectId': u'YOUR-PROJECT',
+                                                  u'projectId': u'YOUR-PROJECT-ID',
                                                   u'resources': { u'bootDiskSizeGb': 0,
                                                                   u'disks': [ { u'autoDelete': True,
                                                                                 u'mountPoint': u'',
@@ -148,7 +149,7 @@ Operation complete
                                                                        u'scopes': [ u'https://www.googleapis.com/auth/compute',
                                                                                     u'https://www.googleapis.com/auth/devstorage.full_control',
                                                                                     u'https://www.googleapis.com/auth/genomics']}}},
-                 u'startTime': u'2016-03-25T22:16:55.000Z'},
+                 u'startTime': u'2016-03-26T20:23:45.000Z'},
   u'name': u'operations/YOUR-NEW-OPERATION-ID'}
 ```
 
@@ -162,11 +163,11 @@ If none, then the operation should have finished successfully.
 ```
 $ gsutil ls -l gs://YOUR-BUCKET/set_vcf_sample_id/output
 
-   5055692  2016-03-25T22:19:46Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140122.indel.genotypes.vcf.gz
-  29162279  2016-03-25T22:19:47Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140122.snp.genotypes.vcf.gz
-   5243803  2016-03-25T22:19:46Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140404.indels_v2.vcf.gz
-  29014774  2016-03-25T22:19:47Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140404.snps_v2.vcf.gz
-     31103  2016-03-25T22:19:45Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140404.svs_v2.vcf.gz
+   5055692  2016-03-26T20:26:08Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140122.indel.genotypes.vcf.gz
+  29162279  2016-03-26T20:26:12Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140122.snp.genotypes.vcf.gz
+   5243803  2016-03-26T20:26:07Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140404.indels_v2.vcf.gz
+  29014774  2016-03-26T20:26:09Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140404.snps_v2.vcf.gz
+     31103  2016-03-26T20:26:07Z  gs://YOUR-BUCKET/set_vcf_sample_id/output/NA12878.wgs.illumina_platinum.20140404.svs_v2.vcf.gz
 TOTAL: 5 objects, 68507651 bytes (65.33 MiB)
 ```
 

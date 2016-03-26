@@ -41,6 +41,14 @@ for specifying zones, such as:
 
 an explicit list may be specified, space-separated:
   --zones us-central1-a us-central1-b
+
+Passing the --original-sample-id is optional. If set, then the pipeline
+script will verify the value in the input VCF, and if not equal, the
+pipeline will fail.
+
+Note that the pipeline API does not allow for input arguments with no
+value. Thus if the --original-sample-id is not specified (or is empty),
+the ORIGINAL_SAMPLE_ID input parameter is left out of the pipeline definition.
 """
 
 import argparse
@@ -60,8 +68,8 @@ parser.add_argument("--disk-size", required=True, type=int,
                     help="Size (in GB) of disk for both input and output")
 parser.add_argument("--zones", required=True, nargs="+",
                     help="List of Google Compute Engine zones (supports wildcards)")
-parser.add_argument("--original-sample-id", required=False, default="none",
-                    help="The original sample ID")
+parser.add_argument("--original-sample-id", required=False,
+                    help="The original sample ID to be validated in the input")
 parser.add_argument("--new-sample-id", required=True,
                     help="The new sample ID")
 parser.add_argument("--script-path", required=True,
@@ -122,7 +130,7 @@ operation = service.pipelines().run(body={
               'chmod u+x ${SCRIPT_DIR}/* && '
 
               '${SCRIPT_DIR}/set_vcf_sample_id.sh '
-                '"${ORIGINAL_SAMPLE_ID}" '
+                '"${ORIGINAL_SAMPLE_ID:-}" '
                 '"${NEW_SAMPLE_ID}" '
                 '"/mnt/data/input/*" '
                 '"/mnt/data/output"'),
@@ -147,20 +155,19 @@ operation = service.pipelines().run(body={
         'disk': 'datadisk'
       }
     }, {
-      'name': 'differ_Script',
-      'description': 'Cloud Storage path to differ.py script',
-      'defaultValue': '%s/differ.py' % args.script_path,
+      'name': 'setVcfSampleId_Python',
+      'description': 'Cloud Storage path to set_vcf_sample_id.py script',
+      'defaultValue': '%s/set_vcf_sample_id.py' % args.script_path,
       'localCopy': {
         'path': 'scripts/',
         'disk': 'datadisk'
       }
-    }, {
+    }] + ([{
       'name': 'ORIGINAL_SAMPLE_ID',
-      'description': 'ID which must already appear in the VCF (default "none")',
-      'defaultValue': 'none',
-    }, {
+      'description': 'Sample ID which must already appear in the VCF header',
+    }] if args.original_sample_id else []) + [ {
       'name': 'NEW_SAMPLE_ID',
-      'description': 'New ID to set in the VCF header',
+      'description': 'New sample ID to set in the VCF header',
     } ],
 
     # By specifying an outputParameter, we instruct the pipelines API to
@@ -202,8 +209,9 @@ operation = service.pipelines().run(body={
     # }
     'inputs' : dict( {
       'inputFile%d' % idx : value for idx, value in enumerate(args.input)
-    }.items() + {
+    }.items() + ({
       'ORIGINAL_SAMPLE_ID' : args.original_sample_id,
+    }.items() if args.original_sample_id else []) + {
       'NEW_SAMPLE_ID' : args.new_sample_id,
     }.items()),
 

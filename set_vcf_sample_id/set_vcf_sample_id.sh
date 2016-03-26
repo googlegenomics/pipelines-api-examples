@@ -37,7 +37,9 @@
 # ** the cloud. Deleting the local copy of the input file allows for the  **
 # ** disk to be sized at less than 2x all of the input VCF files, namely: **
 # **                                                                      **
-# **    disk size ~= size(all VCF) + size(largest VCF)                    **
+# **    disk size ~= 2*size(largest uncompressed VCF)                     **
+# **                 + size(remaining VCFs)                               **
+# **                                                                      **
 
 set -o errexit
 set -o nounset
@@ -49,7 +51,8 @@ set -o nounset
 #      [input_path] \
 #      [output_path]
 #
-#  original_sample_id: Set to the sample ID found in the input VCF(s)
+#  original_sample_id: If set to a non-empty string, the sample ID in the
+#                      input VCF header will be verified before update
 #  new_sample_id: Set to the new sample ID
 #  input_path: on-disk directory or pattern of input VCF files
 #  output_path: on-disk directory to copy output VCF files
@@ -110,33 +113,17 @@ for FILE in ${INPUT_PATH}; do
   INPUT_DIR=$(dirname ${FILE})
   FILE_NAME=$(basename ${FILE})
 
-  # Check if the header actually needs to be updated
-  EXISTING_ID=$(sed --quiet -e 's/^#CHROM\t.*\t\(.*\)$/\1/p' ${FILE}) 
-  if [[ ${EXISTING_ID} == ${NEW_SAMPLE_ID} ]]; then
-    log "WARNING: ID ${NEW_SAMPLE_ID} already set in header of ${FILE_NAME}."
-    mv ${FILE} ${OUTPUT_PATH}
-    SKIPPED=$((SKIPPED + 1))
-  else
-    log "Updating header for file ${FILE_NAME}"
-    sed \
-      -e 's/\(^#CHROM\t.*\t\)'${ORIG_SAMPLE_ID}'/\1'${NEW_SAMPLE_ID}'/' \
-      ${FILE} \
+  log "Updating header for file ${FILE_NAME}"
+  cat ${FILE} |
+    python \
+      "${SCRIPT_DIR}/set_vcf_sample_id.py" \
+      "${ORIG_SAMPLE_ID}" "${NEW_SAMPLE_ID}" \
       > ${OUTPUT_PATH}/${FILE_NAME}
 
-    # Verify that we changed exactly one line
-    LINES_CHANGED=$(
-      python ${SCRIPT_DIR}/differ.py ${FILE} ${OUTPUT_PATH}/${FILE_NAME})
+  # To minimize disk usage, remove the input file now
+  rm -f ${FILE}
 
-    if [[ ${LINES_CHANGED} -ne 1 ]]; then
-      2>&1 echo "Unexpected line change count: ${LINES_CHANGED}"
-      exit 1
-    fi
-
-    # To minimize disk usage, remove the input file now
-    rm -f ${FILE}
-
-    UPDATED=$((UPDATED + 1))
-  fi
+  UPDATED=$((UPDATED + 1))
 
   # Compress the output file if the input was compressed
   case "${COMPRESSION}" in
@@ -155,5 +142,5 @@ END=$(date +%s)
 log ""
 log "Updated: ${UPDATED}"
 log "Skipped: ${SKIPPED}"
-log "Total: ${COUNT} files proessed in $((END-START)) seconds"
+log "Total: ${COUNT} files processed in $((END-START)) seconds"
 
