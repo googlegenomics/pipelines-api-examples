@@ -41,7 +41,7 @@ def main():
   """Entry point to the script."""
 
   if len(sys.argv) != 3:
-    print >> sys.stderr, 'Usage: %s original_id new_id' % sys.argv[0]
+    print >> sys.stderr, "Usage: %s original_id new_id" % sys.argv[0]
     sys.exit(1)
 
   original_id = sys.argv[1]
@@ -78,7 +78,7 @@ def main():
   print >> sys.stderr, "Changed lines: %d" % lines_changed
 
   if lines_changed != 1:
-    print >> sys.stderr, "Changed lines is not 1"
+    print >> sys.stderr, "ERROR: Changed lines is not 1"
     sys.exit(1)
     
 if __name__ == "__main__":
