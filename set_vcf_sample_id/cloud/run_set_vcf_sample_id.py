@@ -129,7 +129,7 @@ operation = service.pipelines().run(body={
               'export SCRIPT_DIR=/mnt/data/scripts && '
               'chmod u+x ${SCRIPT_DIR}/* && '
 
-              '${SCRIPT_DIR}/set_vcf_sample_id.sh '
+              '${SCRIPT_DIR}/process_vcfs.sh '
                 '"${ORIGINAL_SAMPLE_ID:-}" '
                 '"${NEW_SAMPLE_ID}" '
                 '"/mnt/data/input/*" '
@@ -148,8 +148,8 @@ operation = service.pipelines().run(body={
       }
     } for idx in range(len(args.input)) ] + [ {
       'name': 'setVcfSampleId_Script',
-      'description': 'Cloud Storage path to set_vcf_sample_id.sh script',
-      'defaultValue': '%s/set_vcf_sample_id.sh' % args.script_path,
+      'description': 'Cloud Storage path to process_vcfs.sh script',
+      'defaultValue': '%s/process_vcfs.sh' % args.script_path,
       'localCopy': {
         'path': 'scripts/',
         'disk': 'datadisk'

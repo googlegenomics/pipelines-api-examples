@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# set_vcf_sample_id.sh
+# process_vcfs.sh
 #
 # Simple shell script which can be used to change the "sample ID" in
 # a single-sample VCF file. For example, suppose your VCF "header line"
@@ -45,7 +45,7 @@ set -o errexit
 set -o nounset
 
 # Usage:
-#  ./set_vcf_sample_id.sh \
+#  ./process_vcfs.sh \
 #      [original_sample_id] \
 #      [new_sample_id] \
 #      [input_path] \

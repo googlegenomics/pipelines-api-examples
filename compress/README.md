@@ -18,8 +18,8 @@ PYTHONPATH=.. python ./run_gzip.py \
   --zones "us-*" \
   --disk-size 200 \
   --input gs://genomics-public-data/platinum-genomes/vcf/NA12877_S1.genome.vcf \
-  --output gs://YOUR-BUCKET/compress/output_path/NA12877_S1.genome.vcf.gz \
-  --logging gs://YOUR-BUCKET/compress/logging_path \
+  --output gs://YOUR-BUCKET/pipelines-api-examples/compress/output/NA12877_S1.genome.vcf.gz \
+  --logging gs://YOUR-BUCKET/pipelines-api-examples/compress/logging\
   --poll-interval 20
 ```
 
@@ -85,8 +85,8 @@ Operation complete
                                                                        u'minimumRamGb': 3.75}},
                                u'pipelineArgs': { u'clientId': u'',
                                                   u'inputs': { u'inputFile': u'gs://genomics-public-data/platinum-genomes/vcf/NA12877_S1.genome.vcf'},
-                                                  u'logging': { u'gcsPath': u'gs://YOUR-BUCKET/compress/logging_path'},
-                                                  u'outputs': { u'outputFile': u'gs://YOUR-BUCKET/compress/output_path/NA12877_S1.genome.vcf.gz'},
+                                                  u'logging': { u'gcsPath': u'gs://YOUR-BUCKET/pipelines-api-examples/compress/logging'},
+                                                  u'outputs': { u'outputFile': u'gs://YOUR-BUCKET/pipelines-api-examples/compress/output/NA12877_S1.genome.vcf.gz'},
                                                   u'projectId': u'YOUR-PROJECT-ID',
                                                   u'resources': { u'disks': [ { u'autoDelete': True,
                                                                                 u'mountPoint': u'',

@@ -50,8 +50,8 @@ PYTHONPATH=.. python cloud/run_fastqc.py \
   --input \
     gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06986/alignment/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam \
     gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA18628/alignment/NA18628.chromY.LS454.ssaha2.CHB.exon_targetted.20100311.bam \
-  --output gs://YOUR-BUCKET/fastqc/output \
-  --logging gs://YOUR-BUCKET/fastqc/logging \
+  --output gs://YOUR-BUCKET/pipelines-api-examples/fastqc/output \
+  --logging gs://YOUR-BUCKET/pipelines-api-examples/fastqc/logging \
   --poll-interval 20
 ```
 
@@ -121,8 +121,8 @@ Operation complete
                                u'pipelineArgs': { u'clientId': u'',
                                                   u'inputs': { u'inputFile0': u'gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06986/alignment/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam',
                                                                u'inputFile1': u'gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA18628/alignment/NA18628.chromY.LS454.ssaha2.CHB.exon_targetted.20100311.bam'},
-                                                  u'logging': { u'gcsPath': u'gs://YOUR-BUCKET/fastqc/logging'},
-                                                  u'outputs': { u'outputPath': u'gs://YOUR-BUCKET/fastqc/output'},
+                                                  u'logging': { u'gcsPath': u'gs://YOUR-BUCKET/pipelines-api-examples/fastqc/logging'},
+                                                  u'outputs': { u'outputPath': u'gs://YOUR-BUCKET/pipelines-api-examples/fastqc/output'},
                                                   u'projectId': u'YOUR-PROJECT-ID',
                                                   u'resources': { u'disks': [ { u'autoDelete': True,
                                                                                 u'mountPoint': u'',
