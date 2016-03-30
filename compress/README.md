@@ -88,7 +88,7 @@ Operation complete
                                                   u'logging': { u'gcsPath': u'gs://YOUR-BUCKET/pipelines-api-examples/compress/logging'},
                                                   u'outputs': { u'outputFile': u'gs://YOUR-BUCKET/pipelines-api-examples/compress/output/NA12877_S1.genome.vcf.gz'},
                                                   u'projectId': u'YOUR-PROJECT-ID',
-                                                  u'resources': { u'disks': [ { u'autoDelete': True,
+                                                  u'resources': { u'disks': [ { u'autoDelete': False,
                                                                                 u'mountPoint': u'',
                                                                                 u'name': u'data',
                                                                                 u'readOnly': False,

@@ -196,7 +196,6 @@ operation = service.pipelines().run(body={
       # For the data disk, specify the type and size
       'disks': [ {
         'name': 'datadisk',
-        'autoDelete': True,
 
         'sizeGb': args.disk_size,
       } ]
