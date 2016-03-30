@@ -45,13 +45,13 @@ gcloud docker push gcr.io/YOUR-PROJECT-ID/fastqc
 ```
 PYTHONPATH=.. python cloud/run_fastqc.py \
   --project YOUR-PROJECT-ID \
-  --zones us-* \
+  --zones "us-*" \
   --disk-size 100 \
   --input \
     gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06986/alignment/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam \
     gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA18628/alignment/NA18628.chromY.LS454.ssaha2.CHB.exon_targetted.20100311.bam \
-  --output gs://YOUR-BUCKET/fastqc/output \
-  --logging gs://YOUR-BUCKET/fastqc/logging \
+  --output gs://YOUR-BUCKET/pipelines-api-examples/fastqc/output \
+  --logging gs://YOUR-BUCKET/pipelines-api-examples/fastqc/logging \
   --poll-interval 20
 ```
 
@@ -121,8 +121,8 @@ Operation complete
                                u'pipelineArgs': { u'clientId': u'',
                                                   u'inputs': { u'inputFile0': u'gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06986/alignment/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam',
                                                                u'inputFile1': u'gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA18628/alignment/NA18628.chromY.LS454.ssaha2.CHB.exon_targetted.20100311.bam'},
-                                                  u'logging': { u'gcsPath': u'gs://YOUR-BUCKET/fastqc/logging'},
-                                                  u'outputs': { u'outputPath': u'gs://YOUR-BUCKET/fastqc/output'},
+                                                  u'logging': { u'gcsPath': u'gs://YOUR-BUCKET/pipelines-api-examples/fastqc/logging'},
+                                                  u'outputs': { u'outputPath': u'gs://YOUR-BUCKET/pipelines-api-examples/fastqc/output'},
                                                   u'projectId': u'YOUR-PROJECT-ID',
                                                   u'resources': { u'disks': [ { u'autoDelete': True,
                                                                                 u'mountPoint': u'',
@@ -148,7 +148,7 @@ Operation complete
 
 ## (5) Check the results
 
-Check the operation output for a top-level `erors` field.
+Check the operation output for a top-level `errors` field.
 If none, then the operation should have finished successfully.
 
 Navigate to your bucket in the
