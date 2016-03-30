@@ -40,7 +40,7 @@ You can do the packaging to Docker yourself, or use existing Docker images.
 
 ## Examples
 
-* [Compress a file](./compress)
+* [Compress or Decompress files](./compress)
 * [Run FastQC over a list of BAM or FASTQ files](./fastqc)
 * [Use samtools to create a BAM index file](./samtools)
 * [Use a custom script in Cloud Storage to update a VCF header](./set_vcf_sample_id)
