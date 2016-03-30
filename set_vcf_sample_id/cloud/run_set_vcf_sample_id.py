@@ -97,13 +97,13 @@ operation = service.pipelines().run(body={
   # There are some nuances in the API that are still being ironed out
   # to make this more compact.
 
-  'ephemeralPipeline' : {
+  'ephemeralPipeline': {
     'projectId': args.project,
     'name': 'set_vcf_sample_id',
     'description': 'Set the sample ID in a VCF header',
 
     # Define the resources needed for this pipeline.
-    'resources' : {
+    'resources': {
       # Create a data disk that is attached to the VM and destroyed when the
       # pipeline terminates.
       'disks': [ {
@@ -118,7 +118,7 @@ operation = service.pipelines().run(body={
     },
 
     # Specify the docker image to use along with the command
-    'docker' : {
+    'docker': {
       'imageName': 'python:2.7',
 
       # The Pipelines API will create the input directory when localizing files,
@@ -139,7 +139,7 @@ operation = service.pipelines().run(body={
     # The inputFile<n> specified in the pipelineArgs (see below) will
     # specify the Cloud Storage path to copy to /mnt/data/input/.
 
-    'inputParameters' : [ {
+    'inputParameters': [ {
       'name': 'inputFile%d' % idx,
       'description': 'Cloud Storage path to input file(s)',
       'localCopy': {
@@ -173,7 +173,7 @@ operation = service.pipelines().run(body={
     # By specifying an outputParameter, we instruct the pipelines API to
     # copy /mnt/data/output/* to the Cloud Storage location specified in
     # the pipelineArgs (see below).
-    'outputParameters' : [ {
+    'outputParameters': [ {
       'name': 'outputPath',
       'description': 'Cloud Storage path for where to copy the output',
       'localCopy': {
@@ -183,11 +183,11 @@ operation = service.pipelines().run(body={
     } ]
   },
 
-  'pipelineArgs' : {
+  'pipelineArgs': {
     'projectId': args.project,
 
     # Override the resources needed for this pipeline
-    'resources' : {
+    'resources': {
       'minimumRamGb': 1, # Shouldn't need the default 3.75 GB
 
       # Expand any zone short-hand patterns
@@ -203,19 +203,19 @@ operation = service.pipelines().run(body={
 
     # We can set a series of individual files, but typically usage will
     # just be:
-    # 'inputs' : {
-    #   'inputFile0' : 'gs://bucket/<sample>/*.vcf',
+    # 'inputs': {
+    #   'inputFile0': 'gs://bucket/<sample>/*.vcf',
     # }
-    'inputs' : dict( {
-      'inputFile%d' % idx : value for idx, value in enumerate(args.input)
+    'inputs': dict( {
+      'inputFile%d' % idx: value for idx, value in enumerate(args.input)
     }.items() + ({
-      'ORIGINAL_SAMPLE_ID' : args.original_sample_id,
+      'ORIGINAL_SAMPLE_ID': args.original_sample_id,
     }.items() if args.original_sample_id else []) + {
-      'NEW_SAMPLE_ID' : args.new_sample_id,
+      'NEW_SAMPLE_ID': args.new_sample_id,
     }.items()),
 
     # Pass the user-specified Cloud Storage destination path output
-    'outputs' : {
+    'outputs': {
       'outputPath': args.output
     },
 

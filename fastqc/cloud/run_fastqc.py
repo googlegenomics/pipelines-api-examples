@@ -100,13 +100,13 @@ operation = service.pipelines().run(body={
   # There are some nuances in the API that are still being ironed out
   # to make this more compact.
 
-  'ephemeralPipeline' : {
+  'ephemeralPipeline': {
     'projectId': args.project,
     'name': 'fastqc',
     'description': 'Run "FastQC" on one or more files',
 
     # Define the resources needed for this pipeline.
-    'resources' : {
+    'resources': {
       # Create a data disk that is attached to the VM and destroyed when the
       # pipeline terminates.
       'disks': [ {
@@ -121,7 +121,7 @@ operation = service.pipelines().run(body={
     },
 
     # Specify the docker image to use along with the command
-    'docker' : {
+    'docker': {
       'imageName': 'gcr.io/%s/fastqc' % args.project,
 
       # The Pipelines API will create the input directory when localizing files,
@@ -136,7 +136,7 @@ operation = service.pipelines().run(body={
     #
     # We can simply generate a series of inputs (input0, input1, etc.) to support this here.
     #
-    # 'inputParameters' : [ {
+    # 'inputParameters': [ {
     #   'name': 'inputFile0',
     #   'description': 'Cloud Storage path to an input file',
     #   'localCopy': {
@@ -156,7 +156,7 @@ operation = service.pipelines().run(body={
     # The inputFile<n> specified in the pipelineArgs (see below) will specify the
     # Cloud Storage path to copy to /mnt/data/input/.
 
-    'inputParameters' : [ {
+    'inputParameters': [ {
       'name': 'inputFile%d' % idx,
       'description': 'Cloud Storage path to an input file',
       'localCopy': {
@@ -168,7 +168,7 @@ operation = service.pipelines().run(body={
     # By specifying an outputParameter, we instruct the pipelines API to
     # copy /mnt/data/output/* to the Cloud Storage location specified in
     # the pipelineArgs (see below).
-    'outputParameters' : [ {
+    'outputParameters': [ {
       'name': 'outputPath',
       'description': 'Cloud Storage path for where to FastQC output',
       'localCopy': {
@@ -178,11 +178,11 @@ operation = service.pipelines().run(body={
     } ]
   },
 
-  'pipelineArgs' : {
+  'pipelineArgs': {
     'projectId': args.project,
 
     # Override the resources needed for this pipeline
-    'resources' : {
+    'resources': {
       'minimumRamGb': 1, # For this example, override the 3.75 GB default
 
       # Expand any zone short-hand patterns
@@ -197,12 +197,12 @@ operation = service.pipelines().run(body={
     },
 
     # Pass the user-specified Cloud Storage paths as a map of input files
-    # 'inputs' : {
-    #   'inputFile0' : 'gs://bucket/foo.bam',
-    #   'inputFile1' : 'gs://bucket/bar.bam', 
+    # 'inputs': {
+    #   'inputFile0': 'gs://bucket/foo.bam',
+    #   'inputFile1': 'gs://bucket/bar.bam', 
     #   <etc>
     # }
-    'inputs' : {
+    'inputs': {
       'inputFile%d' % idx : value for idx, value in enumerate(args.input)
     },
 
