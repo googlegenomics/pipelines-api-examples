@@ -207,7 +207,7 @@ operation = service.pipelines().run(body={
     },
 
     # Pass the user-specified Cloud Storage destination path of the FastQC output
-    'outputs' : {
+    'outputs': {
       'outputPath': args.output
     },
 
