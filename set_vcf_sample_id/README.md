@@ -133,7 +133,7 @@ Operation complete
                                                   u'outputs': { u'outputPath': u'gs://YOUR-BUCKET/pipelines-api-examples/set_vcf_sample_id/output'},
                                                   u'projectId': u'YOUR-PROJECT-ID',
                                                   u'resources': { u'bootDiskSizeGb': 0,
-                                                                  u'disks': [ { u'autoDelete': True,
+                                                                  u'disks': [ { u'autoDelete': False,
                                                                                 u'mountPoint': u'',
                                                                                 u'name': u'datadisk',
                                                                                 u'readOnly': False,
