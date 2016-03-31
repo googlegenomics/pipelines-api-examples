@@ -151,6 +151,10 @@ Operation complete
 Check the operation output for a top-level `errors` field.
 If none, then the operation should have finished successfully.
 
-Navigate to your bucket in the
-[Cloud Console](https://console.cloud.google.com/project/_/storage)
-to see the output and log files for the operation.
+```
+$ gsutil ls gs://YOUR-BUCKET/pipelines-api-examples/fastqc/output
+gs://YOUR-BUCKET/pipelines-api-examples/fastqc/output/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311_fastqc.html
+gs://YOUR-BUCKET/pipelines-api-examples/fastqc/output/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311_fastqc.zip
+gs://YOUR-BUCKET/pipelines-api-examples/fastqc/output/NA18628.chromY.LS454.ssaha2.CHB.exon_targetted.20100311_fastqc.html
+gs://YOUR-BUCKET/pipelines-api-examples/fastqc/output/NA18628.chromY.LS454.ssaha2.CHB.exon_targetted.20100311_fastqc.zip
+```

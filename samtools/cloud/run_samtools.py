@@ -15,15 +15,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
+"""Python sample demonstrating use of the Google Genomics Pipelines API.
+
+This sample demonstrates running samtools (http://www.htslib.org/) over one
+or more files in Google Cloud Storage.
+
+This sample demonstrates running the pipeline in an "ephemeral" manner;
+no call to pipelines.create() is necessary. No pipeline is persisted
+in the pipelines list.
+
+For large input files, it will typically make sense to have a single
+call to this script (which makes a single call to the Pipelines API).
+
+For small input files, it may make sense to batch them together into a single call.
+Google Compute Engine instance billing is for a minimum of 10 minutes, and then
+per-minute billing after that. If you are running samtools over a BAM file for
+mitochondrial DNA, it may take less than 10 minutes.
+
+So if you have a series of such files, batch them together:
+
+ --input "gs://bucket/sample1/chrMT.bam gs://bucket/sample1/chrY.bam gs://<etc>"
+
 Usage:
-  * python run_set_vcf_sample_id.py \
+  * python run_samtools.py \
       --project <project-id> \
       --zones <gce-zones> \
       --disk-size <size-in-gb> \
-      --original-sample-id <original-id> \
-      --new-sample-id <new-id> \
-      --script-path <gcs-script-path> \
       --input <gcs-input-path> \
       --output <gcs-output-path> \
       --logging <gcs-logging-path> \
@@ -41,14 +58,6 @@ for specifying zones, such as:
 
 an explicit list may be specified, space-separated:
   --zones us-central1-a us-central1-b
-
-Passing the --original-sample-id is optional. If set, then the pipeline
-script will verify the value in the input VCF, and if not equal, the
-pipeline will fail.
-
-Note that the pipeline API does not allow for input arguments with no
-value. Thus if the --original-sample-id is not specified (or is empty),
-the ORIGINAL_SAMPLE_ID input parameter is left out of the pipeline definition.
 """
 
 import argparse
@@ -68,12 +77,6 @@ parser.add_argument("--disk-size", required=True, type=int,
                     help="Size (in GB) of disk for both input and output")
 parser.add_argument("--zones", required=True, nargs="+",
                     help="List of Google Compute Engine zones (supports wildcards)")
-parser.add_argument("--original-sample-id", required=False,
-                    help="The original sample ID to be validated in the input")
-parser.add_argument("--new-sample-id", required=True,
-                    help="The new sample ID")
-parser.add_argument("--script-path", required=True,
-                    help="Cloud Storage path to script file(s)")
 parser.add_argument("--input", required=True, nargs="+",
                     help="Cloud Storage path to input file(s)")
 parser.add_argument("--output", required=True,
@@ -83,7 +86,6 @@ parser.add_argument("--logging", required=True,
 parser.add_argument("--poll-interval", default=0, type=int,
                     help="Frequency (in seconds) to poll for completion (default: no polling)")
 args = parser.parse_args()
-args.script_path.rstrip('/')
 
 # Create the genomics service
 credentials = GoogleCredentials.get_application_default()
@@ -99,8 +101,8 @@ operation = service.pipelines().run(body={
 
   'ephemeralPipeline': {
     'projectId': args.project,
-    'name': 'set_vcf_sample_id',
-    'description': 'Set the sample ID in a VCF header',
+    'name': 'samtools',
+    'description': 'Run samtools on one or more files',
 
     # Define the resources needed for this pipeline.
     'resources': {
@@ -119,63 +121,59 @@ operation = service.pipelines().run(body={
 
     # Specify the Docker image to use along with the command
     'docker': {
-      'imageName': 'python:2.7',
+      'imageName': 'gcr.io/%s/samtools' % args.project,
 
       # The Pipelines API will create the input directory when localizing files,
       # but does not create the output directory.
-
       'cmd': ('mkdir /mnt/data/output && '
-
-              'export SCRIPT_DIR=/mnt/data/scripts && '
-              'chmod u+x ${SCRIPT_DIR}/* && '
-
-              '${SCRIPT_DIR}/process_vcfs.sh '
-                '"${ORIGINAL_SAMPLE_ID:-}" '
-                '"${NEW_SAMPLE_ID}" '
-                '"/mnt/data/input/*" '
-                '"/mnt/data/output"'),
+              'find /mnt/data/input && '
+              'for file in $(/bin/ls /mnt/data/input); do '
+                'samtools index '
+                  '/mnt/data/input/${file} /mnt/data/output/${file}.bai; '
+              'done'),
     },
 
-    # The inputFile<n> specified in the pipelineArgs (see below) will
-    # specify the Cloud Storage path to copy to /mnt/data/input/.
+    # The Pipelines API currently supports full GCS paths, along with patterns (globs),
+    # but it doesn't directly support a list of files being passed as a single input
+    # parameter ("gs://bucket/foo.bam gs://bucket/bar.bam").
+    #
+    # We can simply generate a series of inputs (input0, input1, etc.) to support this here.
+    #
+    # 'inputParameters': [ {
+    #   'name': 'inputFile0',
+    #   'description': 'Cloud Storage path to an input file',
+    #   'localCopy': {
+    #     'path': 'input/',
+    #     'disk': 'datadisk'
+    #   }
+    # }, {
+    #   'name': 'inputFile1',
+    #   'description': 'Cloud Storage path to an input file',
+    #   'localCopy': {
+    #     'path': 'input/',
+    #     'disk': 'datadisk'
+    #   }
+    # <etc>
+    # } ],
+
+    # The inputFile<n> specified in the pipelineArgs (see below) will specify the
+    # Cloud Storage path to copy to /mnt/data/input/.
 
     'inputParameters': [ {
       'name': 'inputFile%d' % idx,
-      'description': 'Cloud Storage path to input file(s)',
+      'description': 'Cloud Storage path to an input file',
       'localCopy': {
         'path': 'input/',
         'disk': 'datadisk'
       }
-    } for idx in range(len(args.input)) ] + [ {
-      'name': 'setVcfSampleId_Script',
-      'description': 'Cloud Storage path to process_vcfs.sh script',
-      'defaultValue': '%s/process_vcfs.sh' % args.script_path,
-      'localCopy': {
-        'path': 'scripts/',
-        'disk': 'datadisk'
-      }
-    }, {
-      'name': 'setVcfSampleId_Python',
-      'description': 'Cloud Storage path to set_vcf_sample_id.py script',
-      'defaultValue': '%s/set_vcf_sample_id.py' % args.script_path,
-      'localCopy': {
-        'path': 'scripts/',
-        'disk': 'datadisk'
-      }
-    }] + ([{
-      'name': 'ORIGINAL_SAMPLE_ID',
-      'description': 'Sample ID which must already appear in the VCF header',
-    }] if args.original_sample_id else []) + [ {
-      'name': 'NEW_SAMPLE_ID',
-      'description': 'New sample ID to set in the VCF header',
-    } ],
+    } for idx in range(len(args.input)) ],
 
     # By specifying an outputParameter, we instruct the pipelines API to
     # copy /mnt/data/output/* to the Cloud Storage location specified in
     # the pipelineArgs (see below).
     'outputParameters': [ {
       'name': 'outputPath',
-      'description': 'Cloud Storage path for where to copy the output',
+      'description': 'Cloud Storage path for where to samtools output',
       'localCopy': {
         'path': 'output/*',
         'disk': 'datadisk'
@@ -188,7 +186,7 @@ operation = service.pipelines().run(body={
 
     # Override the resources needed for this pipeline
     'resources': {
-      'minimumRamGb': 1, # Shouldn't need the default 3.75 GB
+      'minimumRamGb': 1, # For this example, override the 3.75 GB default
 
       # Expand any zone short-hand patterns
       'zones': defaults.get_zones(args.zones),
@@ -201,20 +199,17 @@ operation = service.pipelines().run(body={
       } ]
     },
 
-    # We can set a series of individual files, but typically usage will
-    # just be:
+    # Pass the user-specified Cloud Storage paths as a map of input files
     # 'inputs': {
-    #   'inputFile0': 'gs://bucket/<sample>/*.vcf',
+    #   'inputFile0': 'gs://bucket/foo.bam',
+    #   'inputFile1': 'gs://bucket/bar.bam', 
+    #   <etc>
     # }
-    'inputs': dict( {
-      'inputFile%d' % idx: value for idx, value in enumerate(args.input)
-    }.items() + ({
-      'ORIGINAL_SAMPLE_ID': args.original_sample_id,
-    }.items() if args.original_sample_id else []) + {
-      'NEW_SAMPLE_ID': args.new_sample_id,
-    }.items()),
+    'inputs': {
+      'inputFile%d' % idx : value for idx, value in enumerate(args.input)
+    },
 
-    # Pass the user-specified Cloud Storage destination path output
+    # Pass the user-specified Cloud Storage destination path of the samtools output
     'outputs': {
       'outputPath': args.output
     },

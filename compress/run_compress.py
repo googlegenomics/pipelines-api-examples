@@ -25,7 +25,7 @@ no call to pipelines.create() is necessary. No pipeline is persisted
 in the pipelines list.
 
 Usage:
-  * python run_gzip.py \
+  * python run_compress.py \
       --project <project-id> \
       --zones <gce-zones> \
       --disk-size <size-in-gb> \
@@ -104,14 +104,14 @@ operation = service.pipelines().run(body={
         'name': 'datadisk',
         'autoDelete': True,
 
-        # Within the docker container, specify a mount point for the disk.
+        # Within the Docker container, specify a mount point for the disk.
         # The pipeline input argument below will specify that inputs should be
         # written to this disk.
         'mountPoint': '/mnt/data',
       } ],
     },
 
-    # Specify the docker image to use along with the command
+    # Specify the Docker image to use along with the command
     'docker': {
       'imageName': 'ubuntu', # Stock ubuntu contains the gzip, bzip2 commands
 

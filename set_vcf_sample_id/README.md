@@ -24,9 +24,9 @@ The output VCFs' compression state will reflect the input VCFs'.
 
 #### API Notes
 
-* This example demonstrates using the Pipelines API to run custom code *without building a Docker image*. In this example, the scripts are copied into Cloud Storage and then downloaded at pipeline run time.  The docker image used is the stock [Python 2.7 image from dockerhub](https://hub.docker.com/_/python/).
+* This example demonstrates using the Pipelines API to run custom code *without building a Docker image*. In this example, the scripts are copied into Cloud Storage and then downloaded at pipeline run time.  The Docker image used is the stock [Python 2.7 image from Docker Hub](https://hub.docker.com/_/python/).
 
-* This example demonstrates the use of non-file input parameters. These parameters (`ORIGINAL_SAMPLE_ID` and `NEW_SAMPLE_ID`) get set in the environment and are then available to the code running in the docker container.
+* This example demonstrates the use of non-file input parameters. These parameters (`ORIGINAL_SAMPLE_ID` and `NEW_SAMPLE_ID`) get set in the environment and are then available to the code running in the Docker container.
 
 * If you have already imported your VCFs into Google Genomics, you can update the call set name using:
 
