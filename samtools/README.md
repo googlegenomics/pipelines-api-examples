@@ -13,7 +13,7 @@ docker build -t ${USER}/samtools .
 
 The result should be the newly created .bam.bai file in a subdirectory on your local machine:
 ```
-Running samtools index via docker
+Running samtools index via Docker
 
 Execution completed
 
@@ -32,80 +32,118 @@ docker tag ${USER}/samtools gcr.io/YOUR-PROJECT-ID/samtools
 gcloud docker push gcr.io/YOUR-PROJECT-ID/samtools
 ```
 
-## (4) Create the pipeline definition.
-
-Edit your copy of [create_pipeline.py](./cloud/create_pipeline.py) to specify the id of the Google Cloud Platform project in which the pipeline should be defined and then run the script.
+## (4) Run the Docker image in the cloud
 ```
-python cloud/create_pipeline.py
-```
-The output will be the JSON description of the pipeline.
-```
-{ u'description': u'Run "samtools index" on a BAM file',
-  u'docker': { u'cmd': u'samtools index /mnt/data/input.bam /mnt/data/output.bam.bai',
-               u'imageName': u'gcr.io/YOUR-PROJECT-ID/samtools'},
-  u'inputParameters': [ { u'defaultValue': u'',
-                          u'description': u'GCS path to a BAM to index',
-                          u'localCopy': { u'disk': u'data',
-                                          u'path': u'input.bam'},
-                          u'name': u'inputFile',
-                          u'type': u'TYPE_UNSPECIFIED',
-                          u'value': u''}],
-  u'name': u'samtools index',
-  u'outputParameters': [ { u'defaultValue': u'',
-                           u'description': u'GCS path for where to write the BAM index',
-                           u'localCopy': { u'disk': u'data',
-                                           u'path': u'output.bam.bai'},
-                           u'name': u'outputFile',
-                           u'type': u'TYPE_UNSPECIFIED',
-                           u'value': u''}],
-  u'parameters': [],
-  u'pipelineId': u'YOUR-NEW-PIPELINE-ID',
-  u'projectId': u'YOUR-PROJECT-ID',
-  u'resources': { u'disks': [ { u'autoDelete': True,
-                                u'mountPoint': u'/mnt/data',
-                                u'name': u'data',
-                                u'readOnly': False,
-                                u'sizeGb': 10,
-                                u'source': u'',
-                                u'type': u'PERSISTENT_HDD'}],
-                  u'minimumCpuCores': 1,
-                  u'minimumRamGb': 1,
-                  u'preemptible': False,
-                  u'zones': []}}
-```
-## (5) Run the pipeline on the cloud.
-Edit your copy of [run_pipeline.py](./cloud/run_pipeline.py) to specify:
-
-  1. the id for the pipeline created in the prior step
-  1. the id of the Google Cloud Platform project in which the pipeline should run
-  1. the email address of the Compute Engine default service account. (this can be found in the "Editor" group on the [Cloud Console](https://console.cloud.google.com/project/_/permissions/projectpermissions))
-  1. the bucket in which the pipeline output file and log files should be placed.
-
-and then run the script:
-```
- python ./cloud/run_pipeline.py
+PYTHONPATH=.. python cloud/run_samtools.py \
+  --project YOUR-PROJECT-ID \
+  --zones "us-*" \
+  --disk-size 100 \
+  --input \
+    gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06986/alignment/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam \
+    gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA18628/alignment/NA18628.chromY.LS454.ssaha2.CHB.exon_targetted.20100311.bam \
+  --output gs://YOUR-BUCKET/pipelines-api-examples/samtools/output \
+  --logging gs://YOUR-BUCKET/pipelines-api-examples/samtools/logging \
+  --poll-interval 20
 ```
 
-The output will be the JSON description of the operation.
+* Replace `YOUR-PROJECT-ID` with your project ID.
+* Replace `YOUR-BUCKET` with a bucket in your project.
+
+The `PYTHONPATH` must include the top-level directory of the
+`pipelines-api-examples` in order to pick up modules in the
+[pipelines_pylib](../pipelines_pylib) directory.
+
+The output will be the JSON description of the operation, followed by periodic
+messages for polling. When the operation completes, the full operation will
+be emitted.
 ```
 { u'done': False,
   u'metadata': { u'@type': u'type.googleapis.com/google.genomics.v1.OperationMetadata',
                  u'clientId': u'',
-                 u'createTime': u'2016-02-17T23:51:20.000Z',
+                 u'createTime': u'2016-03-31T04:23:17.000Z',
                  u'events': [],
                  u'projectId': u'YOUR-PROJECT-ID'},
   u'name': u'operations/YOUR-NEW-OPERATION-ID'}
+
+Polling for completion of operation
+Operation not complete. Sleeping 20 seconds
+Operation not complete. Sleeping 20 seconds
+...
+Operation not complete. Sleeping 20 seconds
+
+Operation complete
+
+{ u'done': True,
+  u'metadata': { u'@type': u'type.googleapis.com/google.genomics.v1.OperationMetadata',
+                 u'clientId': u'',
+                 u'createTime': u'2016-03-31T04:23:17.000Z',
+                 u'endTime': u'2016-03-31T04:25:08.000Z',
+                 u'events': [ { u'description': u'start',
+                                u'startTime': u'2016-03-31T04:24:44.636717470Z'},
+                              { u'description': u'pulling-image',
+                                u'startTime': u'2016-03-31T04:24:44.637120289Z'},
+                              { u'description': u'localizing-files',
+                                u'startTime': u'2016-03-31T04:24:58.338833235Z'},
+                              { u'description': u'running-docker',
+                                u'startTime': u'2016-03-31T04:25:04.834650298Z'},
+                              { u'description': u'delocalizing-files',
+                                u'startTime': u'2016-03-31T04:25:05.369221780Z'},
+                              { u'description': u'ok',
+                                u'startTime': u'2016-03-31T04:25:08.447627565Z'}],
+                 u'projectId': u'YOUR-PROJECT-ID',
+                 u'request': { u'@type': u'type.googleapis.com/google.genomics.v1alpha2.RunPipelineRequest',
+                               u'ephemeralPipeline': { u'description': u'Run samtools on one or more files',
+                                                       u'docker': { u'cmd': u'mkdir /mnt/data/output && find /mnt/data/input && for file in $(/bin/ls /mnt/data/input); do samtools index /mnt/data/input/${file} /mnt/data/output/${file}.bai; done',
+                                                                    u'imageName': u'gcr.io/YOUR-PROJECT-ID/samtools'},
+                                                       u'name': u'samtools',
+                                                       u'parameters': [ { u'description': u'Cloud Storage path to an input file',
+                                                                          u'name': u'inputFile0'},
+                                                                        { u'description': u'Cloud Storage path to an input file',
+                                                                          u'name': u'inputFile1'},
+                                                                        { u'description': u'Cloud Storage path for where to samtools output',
+                                                                          u'name': u'outputPath'}],
+                                                       u'projectId': u'YOUR-PROJECT-ID',
+                                                       u'resources': { u'disks': [ { u'autoDelete': True,
+                                                                                     u'name': u'datadisk'}]}},
+                               u'pipelineArgs': { u'clientId': u'',
+                                                  u'inputs': { u'inputFile0': u'gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06986/alignment/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam',
+                                                               u'inputFile1': u'gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA18628/alignment/NA18628.chromY.LS454.ssaha2.CHB.exon_targetted.20100311.bam'},
+                                                  u'logging': { u'gcsPath': u'gs://YOUR-BUCKET/pipelines-api-examples/samtools/logging'},
+                                                  u'outputs': { u'outputPath': u'gs://YOUR-BUCKET/pipelines-api-examples/samtools/output'},
+                                                  u'projectId': u'YOUR-PROJECT-ID',
+                                                  u'resources': { u'bootDiskSizeGb': 0,
+                                                                  u'disks': [ { u'autoDelete': False,
+                                                                                u'mountPoint': u'',
+                                                                                u'name': u'datadisk',
+                                                                                u'readOnly': False,
+                                                                                u'sizeGb': 100,
+                                                                                u'source': u'',
+                                                                                u'type': u'TYPE_UNSPECIFIED'}],
+                                                                  u'minimumCpuCores': 0,
+                                                                  u'minimumRamGb': 1,
+                                                                  u'preemptible': False,
+                                                                  u'zones': [ u'us-central1-a',
+                                                                              u'us-central1-b',
+                                                                              u'us-central1-c',
+                                                                              u'us-central1-f',
+                                                                              u'us-east1-b',
+                                                                              u'us-east1-c',
+                                                                              u'us-east1-d']},
+                                                  u'serviceAccount': { u'email': u'default',
+                                                                       u'scopes': [ u'https://www.googleapis.com/auth/compute',
+                                                                                    u'https://www.googleapis.com/auth/devstorage.full_control',
+                                                                                    u'https://www.googleapis.com/auth/genomics']}}},
+                 u'startTime': u'2016-03-31T04:23:46.000Z'},
+  u'name': u'operations/YOUR-NEW-OPERATION-ID'}
 ```
 
-## (6) Check for completion of the operation.
-A script could be written to poll for status, but here we use the API explorer to check the status of the operation:
+## (5) Check the results
 
-  1. Navigate to the [APIs Explorer](https://developers.google.com/apis-explorer/#p/genomics/v1alpha2/genomics.operations.get).
-  1. In the `name` field, paste in the id of the operation returned in the prior step.  **Be sure to include the `operation/` prefix.**
-  1. Click on "Authorize and Execute".
+Check the operation output for a top-level `errors` field.
+If none, then the operation should have finished successfully.
 
-The result will be a JSON description of the current status of the operation.  When the value of the `done` field is "true", move onto the next step.
-  
-## (7) View the resultant file.
-Navigate to your bucket in the [Cloud Console](https://console.cloud.google.com/project/_/storage) to see the resultant bam.bai file and log files for the operation.
-
+```
+$ gsutil ls gs://YOUR-BUCKET/pipelines-api-examples/samtools/output
+gs://YOUR-BUCKET/pipelines-api-examples/samtools/output/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam.bai
+gs://YOUR-BUCKET/pipelines-api-examples/samtools/output/NA18628.chromY.LS454.ssaha2.CHB.exon_targetted.20100311.bam.bai
+```

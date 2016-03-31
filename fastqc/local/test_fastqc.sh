@@ -16,8 +16,8 @@
 
 # test_fastqc.sh
 #
-# Simple test script to exercise the fastqc docker image.
-# The docker image is assumed to have been tagged with the user id
+# Simple test script to exercise the fastqc Docker image.
+# The Docker image is assumed to have been tagged with the user id
 # upon creation:
 #
 #   docker build -t ${USER}/fastqc PATH/TO/pipelines-api-examples/fastqc/Dockerfile

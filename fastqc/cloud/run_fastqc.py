@@ -113,14 +113,14 @@ operation = service.pipelines().run(body={
         'name': 'datadisk',
         'autoDelete': True,
 
-        # Within the docker container, specify a mount point for the disk.
+        # Within the Docker container, specify a mount point for the disk.
         # The pipeline input argument below will specify that inputs should be
         # written to this disk.
         'mountPoint': '/mnt/data',
       } ],
     },
 
-    # Specify the docker image to use along with the command
+    # Specify the Docker image to use along with the command
     'docker': {
       'imageName': 'gcr.io/%s/fastqc' % args.project,
 

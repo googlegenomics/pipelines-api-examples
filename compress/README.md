@@ -14,7 +14,7 @@ When the Prerequisites from this repository's [README.md](../README.md)
 are satisfied, then you can run this pipeline as:
 
 ```
-PYTHONPATH=.. python ./run_gzip.py \
+PYTHONPATH=.. python ./run_compress.py \
   --project YOUR-PROJECT-ID \
   --zones "us-*" \
   --disk-size 200 \
