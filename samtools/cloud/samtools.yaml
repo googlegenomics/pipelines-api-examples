@@ -23,7 +23,7 @@ resources:
 
 # Specify the Docker image to use along with the command
 docker:
-  imageName: gcr.io/zzy-whitelist01/samtools
+  imageName: gcr.io/YOUR-PROJECT/samtools
 
   # The Pipelines API will create the input directory when localizing files,
   # but does not create the output directory.
