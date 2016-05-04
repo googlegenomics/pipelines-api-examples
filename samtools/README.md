@@ -2,7 +2,7 @@
 
 ## (0) Complete the prerequisites
 
-Be sure you have completed the [Prerequisites](/#prerequisites)
+Be sure you have completed the [Prerequisites](../README.md#prerequisites)
 listed at the top of this github repository.
 
 ## (1) Create the Docker image.
@@ -52,7 +52,7 @@ gcloud alpha genomics pipelines run --help
 
 ### (4a) Run the Docker image in the cloud, using gcloud
 
-To run this example, first edit the included [./cloud/samtools.yaml] file:
+To run this example, first edit the included [./cloud/samtools.yaml](./cloud/samtools.yaml) file:
 
 * Replace `YOUR-PROJECT-ID` with your project ID.
 
@@ -68,10 +68,14 @@ gcloud alpha genomics pipelines run \
 Running: [operations/YOUR-NEW-OPERATION-ID]
 ```
 
+* Replace `YOUR-BUCKET` with a bucket in your project.
+
 ### (4c) Monitor the pipeline operation
 
+This github repo includes a shell script, [../tools/poll.sh](../tools/poll.sh), for monitoring the completion status of an operation.
+
 ```
-../tools/poll.sh YOUR-NEW-OPERATION-ID
+$../tools/poll.sh YOUR-NEW-OPERATION-ID
 Operation not complete. Sleeping 20 seconds
 Operation not complete. Sleeping 20 seconds
 ...
