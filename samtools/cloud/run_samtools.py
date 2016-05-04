@@ -191,7 +191,7 @@ operation = service.pipelines().run(body={
       # Expand any zone short-hand patterns
       'zones': defaults.get_zones(args.zones),
 
-      # For the data disk, specify the type and size
+      # For the data disk, specify the size
       'disks': [ {
         'name': 'datadisk',
 
