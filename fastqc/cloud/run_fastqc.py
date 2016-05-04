@@ -81,7 +81,7 @@ parser.add_argument("--zones", required=True, nargs="+",
 parser.add_argument("--input", required=True, nargs="+",
                     help="Cloud Storage path to input file(s)")
 parser.add_argument("--output", required=True,
-                    help="Cloud Storage path to output file (with the .gz extension)")
+                    help="Cloud Storage path to write output files")
 parser.add_argument("--logging", required=True,
                     help="Cloud Storage path to send logging output")
 parser.add_argument("--poll-interval", default=0, type=int,
@@ -188,7 +188,7 @@ operation = service.pipelines().run(body={
       # Expand any zone short-hand patterns
       'zones': defaults.get_zones(args.zones),
 
-      # For the data disk, specify the type and size
+      # For the data disk, specify the size
       'disks': [ {
         'name': 'datadisk',
 
