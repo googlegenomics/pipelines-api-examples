@@ -1,5 +1,21 @@
 # Use samtools to create a BAM index file
 
+This example will enable you to create an index file (BAI) for a BAM, using [samtools](http://www.htslib.org/).
+Execution of the `samtools index` command will be on a [Google Compute Engine](https://cloud.google.com/compute/docs/)
+virtual machine.
+
+Instructions provided here demonstrate:
+
+1. Building a Docker image containing `samtools`
+1. Testing the Docker image by running it on your local workstation/laptop
+1. Pushing the Docker image to the Google Container Registry
+1. Launching and monitoring the pipeline using command-line tools (`gcloud`)
+1. Launching and monitoring the pipeline calling the Genomics API from Python
+
+The `gcloud` command supports defining your pipeline in a JSON or YAML file and then setting per-run parameters from the command line.
+
+The Python example demonstrates full control over the construction of `pipeline.run()` API call.
+
 ## (0) Complete the prerequisites
 
 Be sure you have completed the [Prerequisites](../README.md#prerequisites)
