@@ -1,3 +1,4 @@
+ls
 #!/bin/bash
 
 # Copyright 2016 Google Inc. All Rights Reserved.
@@ -50,7 +51,7 @@ readonly -f get_operation_all
 # MAIN
 
 # Check usage
-if [[ $# -ne 1 ]]; then
+if [[ $# -lt 1 ]]; then
   echo "Usage: $0 OPERATION-ID <poll-interval-seconds>"
   exit 1
 fi
