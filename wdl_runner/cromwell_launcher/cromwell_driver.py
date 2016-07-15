@@ -1,0 +1,139 @@
+#!/usr/bin/python
+
+# Copyright 2016 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# cromwell_driver.py
+#
+# This script provides a library interface to Cromwell, namely:
+#  * Start the Cromwell server
+#  * Submit execution requests to Cromwell
+#  * Poll Cromwell for job status
+
+import logging
+import os
+import subprocess
+import time
+
+import requests
+
+import sys_util
+
+
+class CromwellDriver(object):
+
+  def __init__(self, cromwell_conf, cromwell_jar):
+    self.cromwell_conf = cromwell_conf
+    self.cromwell_jar = cromwell_jar
+
+    self.cromwell_proc = None
+
+  def start(self):
+    """Start the Cromwell service."""
+    if self.cromwell_proc:
+      logging.info("Request to start Cromwell: already running")
+      return
+
+    self.cromwell_proc = subprocess.Popen([
+        'java',
+        '-Dconfig.file=' + self.cromwell_conf,
+        '-jar', self.cromwell_jar,
+        'server'])
+
+    logging.info("Started Cromwell")
+
+  def fetch(self, wf_id=None, post=False, files=None, method=None):
+    url = 'http://localhost:8000/api/workflows/v1'
+    if wf_id is not None:
+      url = os.path.join(url, wf_id)
+    if method is not None:
+      url = os.path.join(url, method)
+    if post:
+      r = requests.post(url, files=files)
+    else:
+      r = requests.get(url)
+    return r.json()
+
+  def submit(self, wdl, workflow_inputs, workflow_options, sleep_time=15):
+    """Post new job to the server and poll for completion."""
+
+    # Add required input files
+    with open(wdl, 'rb') as f:
+      wdl_source = f.read()
+    with open(workflow_inputs, 'rb') as f:
+      wf_inputs = f.read()
+
+    files = {
+        'wdlSource': wdl_source,
+        'workflowInputs': wf_inputs,
+    }
+
+    # Add workflow options if specified
+    if workflow_options:
+      with open(workflow_options, 'rb') as f:
+        wf_options = f.read()
+        files['workflowOptions'] = wf_options
+
+    # After Cromwell start, it may take a few seconds to be ready for requests.
+    # Try up to a minute to connect.
+    job = None
+    max_time_wait = 60
+    wait_interval = 5
+    for attempt in range(max_time_wait/wait_interval):
+      try:
+        job = self.fetch(post=True, files=files)
+        break
+      except requests.exceptions.ConnectionError as e:
+        logging.info("Failed to connect to Cromwell(%d): %s", attempt, e)
+        time.sleep(wait_interval)
+
+    if not job:
+      sys_util.exit_with_error(
+          "Failed to connect to Cromwell after {0} seconds".format(
+              max_time_wait))
+
+    if job['status'] != 'Submitted':
+      sys_util.exit_with_error(
+          "Job status from Cromwell was not 'Submitted', instead '{0}'".format(
+              job['status']))
+
+    # Job is running.
+    cromwell_id = job['id']
+    logging.info("Cromwell job id: %s", cromwell_id)
+
+    # Poll for completion.
+    while True:
+      time.sleep(sleep_time)
+      status_json = self.fetch(wf_id=cromwell_id, method='status')
+
+      status = status_json['status']
+      if status == 'Succeeded':
+        break
+      elif status == 'Running':
+        pass
+      else:
+        sys_util.exit_with_error(
+            'Status of job is not Running or Succeeded: %s' % status)
+
+    logging.info("Succeeded")
+
+    # Cromwell produces a list of outputs and full job details
+    outputs = self.fetch(wf_id=cromwell_id, method='outputs')
+    metadata = self.fetch(wf_id=cromwell_id, method='metadata')
+
+    return outputs, metadata
+
+
+if __name__ == '__main__':
+  pass
