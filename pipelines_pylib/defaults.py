@@ -23,6 +23,7 @@ _ZONES = [
   "europe-west1-b", "europe-west1-c", "europe-west1-d",
   "us-central1-a", "us-central1-b", "us-central1-c", "us-central1-f",
   "us-east1-b", "us-east1-c", "us-east1-d",
+  "us-west1-a", "us-west1-b",
 ]
 
 def get_zones(input_list):
