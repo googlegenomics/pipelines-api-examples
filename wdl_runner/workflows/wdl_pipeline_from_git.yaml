@@ -1,0 +1,34 @@
+name: WDL Runner
+description: Run a workflow defined by a WDL file
+
+inputParameters:
+- name: WDL
+  description: Workflow definition
+- name: WORKFLOW_INPUTS
+  description: Workflow inputs
+- name: WORKFLOW_OPTIONS
+  description: Workflow options
+
+- name: WORKSPACE
+  description: Cloud Storage path for intermediate files
+- name: OUTPUTS
+  description: Cloud Storage path for output files
+
+- name: GIT_SOURCE_URL
+  defaultValue: https://github.com/googlegenomics/pipelines-api-examples.git
+
+docker:
+  imageName: java:openjdk-8-jre
+
+  # The command passed to docker below creates a directory for the
+  # source code and pulls it from a git repository.
+  # To pull from git, we need to install the git client.
+
+  cmd: >
+    apt-get update && apt-get install --yes git &&
+
+    git clone "${GIT_SOURCE_URL}" /repo &&
+    cd /repo/wdl_runner/cromwell_launcher && source setup.sh &&
+
+    /wdl_runner/wdl_runner.sh
+
