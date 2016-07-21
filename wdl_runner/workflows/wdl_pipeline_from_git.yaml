@@ -15,7 +15,7 @@ inputParameters:
   description: Cloud Storage path for output files
 
 - name: GIT_SOURCE_URL
-  defaultValue: https://github.com/mbookman/pipelines-api-examples.git
+  defaultValue: https://github.com/googlegenomics/pipelines-api-examples.git
 
 docker:
   imageName: java:openjdk-8-jre
