@@ -17,6 +17,9 @@
 # This script should be kept in-sync with the Dockerfile located in
 # the same src directory.
 
+set -o errexit
+set -o nounset
+
 # Assumes: FROM java:openjdk-8-jre
 
 # Install python
@@ -31,7 +34,7 @@ if [[ ! -e /root/google-cloud-sdk ]]; then
   curl https://sdk.cloud.google.com | bash
 fi
 
-# Add the install location explicity to the path (for non-interactive shells)
+# Add the install location explicitly to the path (for non-interactive shells)
 export PATH=/root/google-cloud-sdk/bin:$PATH
 
 # Install pip for the next two steps...

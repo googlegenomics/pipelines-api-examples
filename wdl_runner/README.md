@@ -22,6 +22,7 @@ Execution of a running Pipeline proceeds as:
 1. Create Compute Engine virtual machine
 
 2. Execute wdl_runner.py
+
     a. Run Cromwell (server)
 
     b. Submit workflow, inputs, and options to Cromwell server
