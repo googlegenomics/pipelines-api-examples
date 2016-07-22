@@ -24,7 +24,7 @@ RUN apt-get update && \
 # See https://cloud.google.com/sdk/
 RUN curl https://sdk.cloud.google.com | bash
 
-# Add the install location explicity to the path (for non-interactive shells)
+# Add the install location explicitly to the path (for non-interactive shells)
 ENV PATH /root/google-cloud-sdk/bin:$PATH
 
 # Install pip for the next two steps...
