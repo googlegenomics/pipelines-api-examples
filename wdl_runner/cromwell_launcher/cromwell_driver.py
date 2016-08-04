@@ -86,16 +86,20 @@ class CromwellDriver(object):
         files['workflowOptions'] = wf_options
 
     # After Cromwell start, it may take a few seconds to be ready for requests.
-    # Try up to a minute to connect.
+    # Poll up to a minute for successful connect and submit.
+
     job = None
     max_time_wait = 60
     wait_interval = 5
+
+    time.sleep(wait_interval)
     for attempt in range(max_time_wait/wait_interval):
       try:
         job = self.fetch(post=True, files=files)
         break
       except requests.exceptions.ConnectionError as e:
-        logging.info("Failed to connect to Cromwell(%d): %s", attempt, e)
+        logging.info("Failed to connect to Cromwell (attempt %d): %s",
+          attempt + 1, e)
         time.sleep(wait_interval)
 
     if not job:
@@ -110,12 +114,28 @@ class CromwellDriver(object):
 
     # Job is running.
     cromwell_id = job['id']
-    logging.info("Cromwell job id: %s", cromwell_id)
+    logging.info("Job submitted to Cromwell. job id: %s", cromwell_id)
 
-    # Poll for completion.
+    # Poll Cromwell for job completion.
+    attempt = 0
     while True:
       time.sleep(sleep_time)
-      status_json = self.fetch(wf_id=cromwell_id, method='status')
+
+      # Cromwell occassionally fails to respond to the status request.
+      # Only give up after 3 consecutive failed requests.
+      try:
+        status_json = self.fetch(wf_id=cromwell_id, method='status')
+        attempt = 0
+      except requests.exceptions.ConnectionError as e:
+        attempt += 1
+        logging.info("Error polling Cromwell job status (attempt %d): %s",
+          attempt, e)
+
+        if attempt >= 3:
+          sys_util.exit_with_error(
+            "Cromwell did not respond for %d consecutive requests" % attempt)
+
+        continue
 
       status = status_json['status']
       if status == 'Succeeded':
@@ -124,9 +144,9 @@ class CromwellDriver(object):
         pass
       else:
         sys_util.exit_with_error(
-            'Status of job is not Running or Succeeded: %s' % status)
+            "Status of job is not Running or Succeeded: %s" % status)
 
-    logging.info("Succeeded")
+    logging.info("Cromwell job status: %s", status)
 
     # Cromwell produces a list of outputs and full job details
     outputs = self.fetch(wf_id=cromwell_id, method='outputs')

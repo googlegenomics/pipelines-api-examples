@@ -107,7 +107,7 @@ In this example, we push the container to
 via the following commands:
 
 ```
-docker tag -f ${USER}/wdl_runner gcr.io/YOUR-PROJECT-ID/wdl_runner
+docker tag ${USER}/wdl_runner gcr.io/YOUR-PROJECT-ID/wdl_runner
 gcloud docker push gcr.io/YOUR-PROJECT-ID/wdl_runner
 ```
 

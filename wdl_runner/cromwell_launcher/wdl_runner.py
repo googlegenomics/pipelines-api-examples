@@ -166,7 +166,8 @@ def main():
   args.output_dir.rstrip('/')
 
   # Write logs at info level
-  logging.basicConfig(level=logging.INFO)
+  FORMAT = '%(asctime)-15s %(module)s %(levelname)s: %(message)s'
+  logging.basicConfig(level=logging.INFO, format=FORMAT)
 
   # Don't info-log every new connection to localhost, to keep stderr small.
   logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
