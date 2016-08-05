@@ -118,6 +118,7 @@ class CromwellDriver(object):
 
     # Poll Cromwell for job completion.
     attempt = 0
+    max_failed_attempts = 3
     while True:
       time.sleep(sleep_time)
 
@@ -131,7 +132,7 @@ class CromwellDriver(object):
         logging.info("Error polling Cromwell job status (attempt %d): %s",
           attempt, e)
 
-        if attempt >= 3:
+        if attempt >= max_failed_attempts:
           sys_util.exit_with_error(
             "Cromwell did not respond for %d consecutive requests" % attempt)
 
