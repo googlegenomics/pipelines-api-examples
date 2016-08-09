@@ -69,7 +69,7 @@ if [[ ! -e /root/google-cloud-sdk ]]; then
   retry_cmd 'curl https://sdk.cloud.google.com | bash'
 fi
 
-# Add the install location explicity to the path (for non-interactive shells)
+# Add the install location explicitly to the path (for non-interactive shells)
 export PATH=/root/google-cloud-sdk/bin:$PATH
 
 # Install pip for the next two steps...
