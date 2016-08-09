@@ -20,15 +20,17 @@ inputParameters:
 docker:
   imageName: java:openjdk-8-jre
 
-  # The command passed to docker below creates a directory for the
-  # source code and pulls it from a git repository.
-  # To pull from git, we need to install the git client.
+  cmd: |
+    # The command passed to docker below creates a directory for the
+    # source code and pulls it from a git repository.
+    # To pull from git, we need to install the git client.
 
-  cmd: >
-    apt-get update && apt-get install --yes git &&
+    set -o errexit
+    set -o nounset
 
-    git clone "${GIT_SOURCE_URL}" /repo &&
-    cd /repo/wdl_runner/cromwell_launcher && source setup.sh &&
+    apt-get update && apt-get install --yes git
+
+    git clone "${GIT_SOURCE_URL}" /repo
+    cd /repo/wdl_runner/cromwell_launcher && source setup.sh
 
     /wdl_runner/wdl_runner.sh
-

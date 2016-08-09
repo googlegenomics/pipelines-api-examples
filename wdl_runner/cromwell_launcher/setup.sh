@@ -20,32 +20,67 @@
 set -o errexit
 set -o nounset
 
+# retry_cmd
+#
+# Any operation that is dependent on internet connectivity and server
+# availability is vulnerable to intermittent failure.
+#
+# This function will retry the specified command up to a specified number
+# of attempts (default 5 attempts).
+# The wait between attempts can also be set (default: 5 seconds).
+function retry_cmd () {
+  local cmd="${1}"
+  local max_attempts="${2:-5}"
+  local wait_seconds="${3:-5}"
+
+  echo "RUNNING: ${cmd}"
+  echo
+
+  for ((i = 0; i < ${max_attempts}; i++)); do
+    if eval "${cmd}"; then
+      echo
+      echo "SUCCEEDED: ${cmd}"
+
+      return
+    fi
+
+    if [[ ${i} -lt ${max_attempts} ]]; then
+      echo "SLEEP: ${wait_seconds} seconds before retrying"
+      sleep ${wait_seconds}
+    fi
+  done
+
+  echo "FAILED: ${cmd}"
+  exit 1
+}
+readonly -f retry_cmd
+
 # Assumes: FROM java:openjdk-8-jre
 
 # Install python
 apt-get update && \
-apt-get install python --yes && \
+retry_cmd 'apt-get install python --yes' && \
 apt-get clean && \
 rm -rf /var/lib/apt/lists/*
 
 # Install gcloud
 # See https://cloud.google.com/sdk/
 if [[ ! -e /root/google-cloud-sdk ]]; then
-  curl https://sdk.cloud.google.com | bash
+  retry_cmd 'curl https://sdk.cloud.google.com | bash'
 fi
 
-# Add the install location explicitly to the path (for non-interactive shells)
+# Add the install location explicity to the path (for non-interactive shells)
 export PATH=/root/google-cloud-sdk/bin:$PATH
 
 # Install pip for the next two steps...
 apt-get update && \
-apt-get install python-pip --yes
+retry_cmd 'apt-get install python-pip --yes'
 
 # Install Python "requests" (for cromwell_driver.py) package
-pip install requests
+retry_cmd 'pip install requests'
 
 # Install Google Python client (for file_util.py) package
-pip install --upgrade google-api-python-client
+retry_cmd 'pip install --upgrade google-api-python-client'
 
 # Remove pip
 apt-get remove --yes python-pip && \
@@ -66,7 +101,7 @@ chmod u+x /wdl_runner/wdl_runner.sh
 # Copy Cromwell and the Cromwell conf template
 mkdir /cromwell
 (cd /cromwell && \
-    curl -L -O https://github.com/broadinstitute/cromwell/releases/download/0.19/cromwell-0.19.jar)
+    retry_cmd 'curl -L -O https://github.com/broadinstitute/cromwell/releases/download/0.19/cromwell-0.19.jar')
 ln /cromwell/cromwell-0.19.jar /cromwell/cromwell.jar
 cp jes_template.conf /cromwell/
 
