@@ -16,6 +16,8 @@ inputParameters:
 
 - name: GIT_SOURCE_URL
   defaultValue: https://github.com/googlegenomics/pipelines-api-examples.git
+- name: GIT_BRANCH
+  defaultValue: master
 
 docker:
   imageName: java:openjdk-8-jre
@@ -31,6 +33,10 @@ docker:
     apt-get update && apt-get install --yes git
 
     git clone "${GIT_SOURCE_URL}" /repo
+    cd /repo && git checkout ${GIT_BRANCH}
     cd /repo/wdl_runner/cromwell_launcher && source setup.sh
 
     /wdl_runner/wdl_runner.sh
+
+resources:
+  minimumRamGb: 1
