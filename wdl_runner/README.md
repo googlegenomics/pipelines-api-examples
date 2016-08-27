@@ -224,3 +224,39 @@ gsutil -m rm gs://YOUR-BUCKET/pipelines-api-examples/wdl_runner/workspace/**
 
 * Replace `YOUR-BUCKET` with a bucket in your project.
 
+# Running reproducible workflows
+
+To ensure that the same software is used for each run of your workflows,
+create a Docker image as described above, and use the ``wdl_pipeline.yaml``
+file.
+
+If you prefer not to build your own Docker image, but instead use
+``wdl_pipeline_from_git.yaml``, then for each run of a workflow, the master
+node that runs Cromwell will download the latest version of:
+
+* [java:openjdk-8-jre Docker image](https://hub.docker.com/_/openjdk/)
+* [Python runtime](https://packages.debian.org/jessie/python)
+* [Google Cloud SDK](https://cloud.google.com/sdk/)
+* [Python pip](https://packages.debian.org/jessie/python/python-pip)
+* [Python requests](https://pypi.python.org/pypi/requests)
+* [Google Python Client](https://github.com/google/google-api-python-client)
+
+and will download a fixed version of Cromwell.
+
+You may want to ensure that changes to *this* repository do not impact the
+reproducibility or reliability of your workflows. You can select a specific
+software commit for this repository by passing the `GIT_BRANCH` pipeline
+argument. For example, adding:
+
+    --inputs GIT_BRANCH=f412317d5a34de3c239d161bd27a84cee1b1438e
+
+to the ``gcloud ... genomics pipelines run`` command will ensure that the
+code used to download and launch Cromwell is from time of the
+[Aug 10, 2016 commit](https://github.com/googlegenomics/pipelines-api-examples/commit/f412317d5a34de3c239d161bd27a84cee1b1438e).
+
+You can see a list of commits in this repository [on github](../../../commits/master)
+or with the command:
+
+    git log
+
+from within your clone of the repository.
