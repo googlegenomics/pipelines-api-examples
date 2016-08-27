@@ -248,15 +248,15 @@ reproducibility or reliability of your workflows. You can select a specific
 software commit for this repository by passing the `GIT_BRANCH` pipeline
 argument. For example, adding:
 
-  --inputs GIT_BRANCH=f412317d5a34de3c239d161bd27a84cee1b1438e
+    --inputs GIT_BRANCH=f412317d5a34de3c239d161bd27a84cee1b1438e
 
 to the ``gcloud ... genomics pipelines run`` command will ensure that the
 code used to download and launch Cromwell is from time of the
 [Aug 10, 2016 commit](https://github.com/googlegenomics/pipelines-api-examples/commit/f412317d5a34de3c239d161bd27a84cee1b1438e).
 
-You can see a list of commits in this repository [on github](/commits/master)
+You can see a list of commits in this repository [on github](../../../commits/master)
 or with the command:
 
-  git log
+    git log
 
 from within your clone of the repository.
