@@ -91,7 +91,7 @@ Running: [operations/YOUR-NEW-OPERATION-ID]
 This github repo includes a shell script, [../tools/poll.sh](../tools/poll.sh), for monitoring the completion status of an operation.
 
 ```
-$../tools/poll.sh YOUR-NEW-OPERATION-ID
+$ ../tools/poll.sh YOUR-NEW-OPERATION-ID 20
 Operation not complete. Sleeping 20 seconds
 Operation not complete. Sleeping 20 seconds
 ...
@@ -100,14 +100,20 @@ Operation not complete. Sleeping 20 seconds
 Operation complete
 done: true
 metadata:
-  '@type': type.googleapis.com/google.genomics.v1.OperationMetadata
-  clientId: ''
-  createTime: '2016-05-04T17:21:07.000Z'
-  endTime: '2016-05-04T17:22:34.000Z'
-...
-  startTime: '2016-05-04T17:21:36.000Z'
+  events:
+  - description: start
+    startTime: '2016-05-04T17:22:16.258279445Z'
+  - description: pulling-image
+    startTime: '2016-05-04T17:22:16.258324967Z'
+  - description: localizing-files
+    startTime: '2016-05-04T17:22:27.650908389Z'
+  - description: running-docker
+    startTime: '2016-05-04T17:22:30.615818360Z'
+  - description: delocalizing-files
+    startTime: '2016-05-04T17:22:31.100643739Z'
+  - description: ok
+    startTime: '2016-05-04T17:22:34.669517713Z'
 name: operations/YOUR-NEW-OPERATION-ID
-
 ```
 
 ### (4d) Check the results

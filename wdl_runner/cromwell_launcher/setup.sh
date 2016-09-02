@@ -101,8 +101,8 @@ chmod u+x /wdl_runner/wdl_runner.sh
 # Copy Cromwell and the Cromwell conf template
 mkdir /cromwell
 (cd /cromwell && \
-    retry_cmd 'curl -L -O https://github.com/broadinstitute/cromwell/releases/download/0.19/cromwell-0.19.jar')
-ln /cromwell/cromwell-0.19.jar /cromwell/cromwell.jar
+    retry_cmd 'curl -L -O https://github.com/broadinstitute/cromwell/releases/download/0.19.3/cromwell-0.19.3.jar')
+ln /cromwell/cromwell-0.19.3.jar /cromwell/cromwell.jar
 cp jes_template.conf /cromwell/
 
 # Set up the runtime environment
