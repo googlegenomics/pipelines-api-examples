@@ -20,7 +20,40 @@
 set -o errexit
 set -o nounset
 
-# Caller must have provided a shell function or command "retry_cmd".
+# retry_cmd
+#
+# Any operation that is dependent on internet connectivity and server
+# availability is vulnerable to intermittent failure.
+#
+# This function will retry the specified command up to a specified number
+# of attempts (default 5 attempts).
+# The wait between attempts can also be set (default: 5 seconds).
+function retry_cmd () {
+  local cmd="${1}"
+  local max_attempts="${2:-5}"
+  local wait_seconds="${3:-5}"
+
+  echo "RUNNING: ${cmd}"
+  echo
+
+  for ((i = 0; i < ${max_attempts}; i++)); do
+    if eval "${cmd}"; then
+      echo
+      echo "SUCCEEDED: ${cmd}"
+
+      return
+    fi
+
+    if [[ ${i} -lt ${max_attempts} ]]; then
+      echo "SLEEP: ${wait_seconds} seconds before retrying"
+      sleep ${wait_seconds}
+    fi
+  done
+
+  echo "FAILED: ${cmd}"
+  exit 1
+}
+readonly -f retry_cmd
 
 # Assumes: FROM java:openjdk-8-jre
 
