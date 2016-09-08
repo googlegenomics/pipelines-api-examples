@@ -20,53 +20,7 @@
 set -o errexit
 set -o nounset
 
-# Caller of the setup script can configure the extent to which any
-# single setup command will be retried on failure by setting the
-# environment variables:
-#
-#  SETUP_RETRY_INTERVAL_SECONDS (default 10)
-#  SETUP_RETRY_MAX_SECONDS      (default 300)
-#
-readonly RETRY_INTERVAL_SECONDS=${SETUP_RETRY_INTERVAL_SECONDS:-10}
-readonly RETRY_MAX_SECONDS=${SETUP_RETRY_MAX_SECONDS:-5*60}
-
-# retry_cmd
-#
-# Any operation that is dependent on internet connectivity and server
-# availability is vulnerable to intermittent failure.
-#
-# This function will sleep a designated interval between failures
-# (retry_interval).
-# The aggregated sleep time is capped at a designated maximum (retry_max).
-function retry_cmd () {
-  local cmd="${1}"
-  local retry_interval="${2:-${RETRY_INTERVAL_SECONDS}}"
-  local retry_max="${3:-${RETRY_MAX_SECONDS}}"
-
-  echo "RUNNING: ${cmd}"
-  echo
-
-  retry_time=0
-  while ((retry_time < retry_max)); do
-    if eval "${cmd}"; then
-      echo
-      echo "SUCCEEDED: ${cmd}"
-
-      return
-    fi
-
-    if ((retry_time < retry_max)); then
-      echo "SLEEP: ${retry_interval} seconds before retrying"
-      sleep ${retry_interval}
-      ((retry_time+=retry_interval))
-    fi
-  done
-
-  echo "Total retry time (${retry_time}) reached max ($((retry_max))) seconds"
-  echo "FAILED: ${cmd}"
-  exit 1
-}
-readonly -f retry_cmd
+# Caller must have provided a shell function or command "retry_cmd".
 
 # Assumes: FROM java:openjdk-8-jre
 
