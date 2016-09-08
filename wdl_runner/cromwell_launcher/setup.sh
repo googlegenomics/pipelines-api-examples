@@ -36,8 +36,8 @@ readonly RETRY_MAX_SECONDS=${SETUP_RETRY_MAX_SECONDS:-5*60}
 # availability is vulnerable to intermittent failure.
 #
 # This function will sleep a designated interval between failures
-# (wait_seconds).
-# The aggregated sleep time is capped at a designated maximum (max_attempts).
+# (retry_interval).
+# The aggregated sleep time is capped at a designated maximum (retry_max).
 function retry_cmd () {
   local cmd="${1}"
   local retry_interval="${2:-${RETRY_INTERVAL_SECONDS}}"
