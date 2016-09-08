@@ -19,6 +19,11 @@ inputParameters:
 - name: GIT_BRANCH
   defaultValue: master
 
+- name: SETUP_RETRY_INTERVAL_SECONDS
+  defaultValue: 30
+- name: SETUP_RETRY_MAX_SECONDS
+  defaultValue: 8*60
+
 docker:
   imageName: java:openjdk-8-jre
 
