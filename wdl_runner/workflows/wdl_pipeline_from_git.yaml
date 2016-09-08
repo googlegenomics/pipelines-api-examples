@@ -19,6 +19,11 @@ inputParameters:
 - name: GIT_BRANCH
   defaultValue: master
 
+- name: SETUP_RETRY_INTERVAL_SECONDS
+  defaultValue: "30"
+- name: SETUP_RETRY_MAX_SECONDS
+  defaultValue: "5*60"
+
 docker:
   imageName: java:openjdk-8-jre
 
@@ -30,7 +35,42 @@ docker:
     set -o errexit
     set -o nounset
 
-    apt-get update && apt-get install --yes git
+    # retry_cmd
+    #
+    # This function will sleep a designated interval between failures.
+    # The aggregated sleep time is capped at a designated maximum.
+    function retry_cmd () {
+      local cmd="${1}"
+      local retry_interval="${2:-${SETUP_RETRY_INTERVAL_SECONDS}}"
+      local retry_max="${3:-${SETUP_RETRY_MAX_SECONDS}}"
+
+      echo "RUNNING: ${cmd}" && echo
+
+      retry_time=0
+      while ((retry_time < retry_max)); do
+        if eval "${cmd}"; then
+          echo && echo "SUCCEEDED: ${cmd}"
+          return
+        fi
+
+        if ((retry_time < retry_max)); then
+          echo "SLEEP: ${retry_interval} seconds before retrying"
+          sleep ${retry_interval}
+          ((retry_time+=retry_interval))
+        fi
+      done
+
+      echo "Total retry time (${retry_time}) reached max ($((retry_max)))"
+      echo "FAILED: ${cmd}"
+      exit 1
+    }
+
+    # Export the retry_cmd function to subshells (notably setup.sh)
+    export -f retry_cmd
+
+    # MAIN
+
+    retry_cmd 'apt-get update && apt-get install --yes git'
 
     git clone "${GIT_SOURCE_URL}" /repo
     cd /repo && git checkout ${GIT_BRANCH}
