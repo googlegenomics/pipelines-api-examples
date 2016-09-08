@@ -42,7 +42,7 @@ set -o errexit
 set -o nounset
 
 readonly SCRIPT_DIR=$(dirname "${0}")
-readonly REPO_ROOT=$(readlink -f ${SCRIPT_DIR}/../../)
+readonly REPO_ROOT=$(cd ${SCRIPT_DIR}/../../ && pwd) 
 
 # Launch the script from the wdl_runner directory (as the README indicates)
 cd ${REPO_ROOT}/wdl_runner

@@ -16,6 +16,18 @@
 
 # operations_util.sh
 
+# get_operation_value
+#
+# Request just the specified value of the operation
+function get_operation_value() {
+  local operation_id="${1}"
+  local field="${2}"
+
+  gcloud alpha genomics operations describe ${operation_id} \
+      --format='value('${field}')'
+}
+readonly -f get_operation_value
+
 # get_operation_done_status
 #
 # Request just the value of the operation top-level "done" field.

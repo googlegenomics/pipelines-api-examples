@@ -33,21 +33,12 @@ set -o errexit
 set -o nounset
 
 readonly SCRIPT_DIR=$(dirname "${0}")
-readonly REPO_ROOT=$(readlink -f ${SCRIPT_DIR}/../../)
+readonly REPO_ROOT=$(cd ${SCRIPT_DIR}/../../ && pwd) 
 
 # Bring in polling utility functions
 source ${REPO_ROOT}/tools/operations_util.sh
 
 # FUNCTIONS
-
-# get_yaml_value
-#
-# Wrapper around the get_yaml_value.py script to extract values from
-# a YAML string.
-function get_yaml_value() {
-  python ${REPO_ROOT}/tools/get_yaml_value.py "${1}" "${2}"
-}
-readonly -f get_yaml_value
 
 # gsutil_ls
 #
@@ -90,12 +81,11 @@ readonly POLL_INTERVAL_SECONDS="${2:-60}"  # Default: 60 seconds between request
 readonly POLL_WAIT_MAX="${3:-}"            # Default: wait forever
 
 # Get GCS paths from the operation
-OPERATION=$(get_operation_all ${OPERATION_ID})
-LOGGING=$(get_yaml_value "${OPERATION}" \
+LOGGING=$(get_operation_value "${OPERATION_ID}" \
             "metadata.request.pipelineArgs.logging.gcsPath")
-WORKSPACE=$(get_yaml_value "${OPERATION}" \
+WORKSPACE=$(get_operation_value "${OPERATION_ID}" \
             "metadata.request.pipelineArgs.inputs.WORKSPACE")
-OUTPUTS=$(get_yaml_value "${OPERATION}" \
+OUTPUTS=$(get_operation_value "${OPERATION_ID}" \
             "metadata.request.pipelineArgs.inputs.OUTPUTS")
 
 echo "Logging: ${LOGGING}"
