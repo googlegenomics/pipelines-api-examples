@@ -20,23 +20,34 @@
 set -o errexit
 set -o nounset
 
+# Caller of the setup script can configure the extent to which any
+# single setup command will be retried on failure by setting the
+# environment variables:
+#
+#  SETUP_RETRY_INTERVAL_SECONDS (default 10)
+#  SETUP_RETRY_MAX_SECONDS      (default 300)
+#
+readonly RETRY_INTERVAL_SECONDS=${SETUP_RETRY_INTERVAL_SECONDS:-10}
+readonly RETRY_MAX_SECONDS=${SETUP_RETRY_MAX_SECONDS:-5*60}
+
 # retry_cmd
 #
 # Any operation that is dependent on internet connectivity and server
 # availability is vulnerable to intermittent failure.
 #
-# This function will retry the specified command up to a specified number
-# of attempts (default 5 attempts).
-# The wait between attempts can also be set (default: 5 seconds).
+# This function will sleep a designated interval between failures
+# (wait_seconds).
+# The aggregated sleep time is capped at a designated maximum (max_attempts).
 function retry_cmd () {
   local cmd="${1}"
-  local max_attempts="${2:-5}"
-  local wait_seconds="${3:-5}"
+  local retry_interval="${2:-${RETRY_INTERVAL_SECONDS}}"
+  local retry_max="${3:-${RETRY_MAX_SECONDS}}"
 
   echo "RUNNING: ${cmd}"
   echo
 
-  for ((i = 0; i < ${max_attempts}; i++)); do
+  retry_time=0
+  while ((retry_time < retry_max)); do
     if eval "${cmd}"; then
       echo
       echo "SUCCEEDED: ${cmd}"
@@ -44,12 +55,14 @@ function retry_cmd () {
       return
     fi
 
-    if [[ ${i} -lt ${max_attempts} ]]; then
-      echo "SLEEP: ${wait_seconds} seconds before retrying"
-      sleep ${wait_seconds}
+    if ((retry_time < retry_max)); then
+      echo "SLEEP: ${retry_interval} seconds before retrying"
+      sleep ${retry_interval}
+      ((retry_time+=retry_interval))
     fi
   done
 
+  echo "Total retry time (${retry_time}) reached max ($((retry_max))) seconds"
   echo "FAILED: ${cmd}"
   exit 1
 }
