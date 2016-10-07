@@ -120,7 +120,10 @@ docker:
 
 If you have built your own Docker image, then change the imageName:
 
+```
+docker:
   imageName: gcr.io/YOUR-PROJECT-ID/wdl_runner
+```
 
 * Replace `YOUR-PROJECT-ID` with your project ID.
 
