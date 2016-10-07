@@ -54,7 +54,7 @@ Scratch directory:
 In this example, we push the container to [Google Container Registry](https://cloud.google.com/container-registry/) via the following commands:
 ```
 docker tag ${USER}/samtools gcr.io/YOUR-PROJECT-ID/samtools
-gcloud docker push gcr.io/YOUR-PROJECT-ID/samtools
+gcloud docker -- push gcr.io/YOUR-PROJECT-ID/samtools
 ```
 
 ## (4) Run the Docker image in the cloud, using gcloud
