@@ -38,7 +38,7 @@ Scratch directory:
 In this example, we push the container to [Google Container Registry](https://cloud.google.com/container-registry/) via the following commands:
 ```
 docker tag ${USER}/fastqc gcr.io/YOUR-PROJECT-ID/fastqc
-gcloud docker push gcr.io/YOUR-PROJECT-ID/fastqc
+gcloud docker -- push gcr.io/YOUR-PROJECT-ID/fastqc
 ```
 
 ## (4) Run the Docker image in the cloud

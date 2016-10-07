@@ -15,7 +15,7 @@ inputParameters:
   description: Cloud Storage path for output files
 
 docker:
-  imageName: gcr.io/YOUR-PROJECT-ID/wdl_runner
+  imageName: gcr.io/broad-dsde-outreach/wdl_runner:2016_10_05
 
   cmd: >
     /wdl_runner/wdl_runner.sh
