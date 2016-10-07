@@ -110,7 +110,7 @@ gcloud docker -- push gcr.io/YOUR-PROJECT-ID/wdl_runner
 ## (2) Run the sample workflow in the cloud
 
 The file [./workflows/wdl_pipeline.yaml](./workflows/wdl_pipeline.yaml)
-defines a pipeline for runing WDL workflows. By default, it uses the
+defines a pipeline for running WDL workflows. By default, it uses the
 docker image built by the Broad Institute from this repository:
 
 ```
