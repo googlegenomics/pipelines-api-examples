@@ -20,6 +20,12 @@
 set -o errexit
 set -o nounset
 
+2>&1 echo "*** DEPRECATION NOTICE ***"
+2>&1 echo "Use of this script is deprecated."
+2>&1 echo "wdl_pipelines_from_git.yaml has been removed."
+2>&1 echo "Use wdl_pipelines.yaml instead."
+2>&1 echo "*** DEPRECATION NOTICE ***"
+
 readonly RETRY_INTERVAL_SECONDS=${SETUP_RETRY_INTERVAL_SECONDS:-30}
 readonly RETRY_MAX_SECONDS=${SETUP_RETRY_MAX_SECONDS:-5*60}
 
