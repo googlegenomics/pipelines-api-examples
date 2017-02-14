@@ -141,6 +141,8 @@ class CromwellDriver(object):
       status = status_json['status']
       if status == 'Succeeded':
         break
+      elif status == 'Submitted':
+        pass
       elif status == 'Running':
         pass
       else:
