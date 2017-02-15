@@ -14,14 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# cwl_shutdown_script.sh
+# cwl_shutdown.sh
 #
 # This is the shutdown script that runs on Compute Engine before the VM shuts down.
 
+echo "$(date)"
+echo "Running shutdown script"
+
 METADATA_URL="http://metadata.google.internal/computeMetadata/v1/instance"
 METADATA_HEADERS="Metadata-Flavor: Google"
-OPERATION_ID=$(curl "${METADATA_URL}/attributes/operation-id" -H "${METADATA_HEADERS}")
 OUTPUT=$(curl "${METADATA_URL}/attributes/output" -H "${METADATA_HEADERS}")
+OPERATION_ID=$(curl "${METADATA_URL}/attributes/operation-id" -H "${METADATA_HEADERS}")
 STATUS_LOCAL="/tmp/status-${OPERATION_ID}.txt"
 
 STDOUT=/tmp/stdout-${OPERATION_ID}.txt
@@ -33,13 +36,14 @@ CMD="gsutil -m cp ${STDOUT} ${STDERR} ${OUTPUT}/"
 echo $CMD
 $CMD
 
-echo "Checking job status"
-STATUS=$( gsutil cat ${STATUS_LOCAL} )
+# Typically shutdown will cause a running job to fail and status will be set to FAILED
+# In case the status is left as RUNNING, set it to FAILED
+STATUS=$(cat ${STATUS_LOCAL})
+echo "Status ${STATUS}"
 
 if [[ ${STATUS} == "RUNNING" ]]; then
-  echo "VM terminated manually or due to preemption"
-  STATUS_LOCAL="/tmp/status-${OPERATION_ID}.txt"
-  echo "TERMINATED" > ${STATUS_LOCAL}
+  echo "Setting status to FAILED"
+  echo "FAILED" > ${STATUS_LOCAL}
   STATUS_FILE=$(curl "${METADATA_URL}/attributes/status-file" -H "${METADATA_HEADERS}")
   gsutil cp ${STATUS_LOCAL} ${STATUS_FILE}
 fi

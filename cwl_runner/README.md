@@ -21,6 +21,8 @@ The startup script running on the VM will:
 1. Copy stdout and stderr logs to Google Cloud Storage
 1. Shutdown and delete the VM and disk
 
+__Note that the CWL runner does not use the Pipelines API. If you don't have enough quota, the script will fail; it won't be queued to run when quota is available.__
+
 ## Prerequisites
 
 1. Download the one required file, `cwl_runner.sh`, or, if you prefer, clone or fork this github repository.
@@ -46,10 +48,9 @@ Here's an example command-line:
 
 ```
 ./cwl_runner.sh \
-  --workflow-file gs://jbingham-scratch/gdc-dnaseq-cwl/workflows/dnaseq/transform.cwl \
-  --settings-file gs://jbingham-scratch/cwl/input/gdc-dnaseq-input.json \
-  --input-recursive gs://jbingham-scratch/gdc-dnaseq-cwl \
-  --input gs://jbingham-scratch/cwl/input/* \
+  --workflow-file gs://genomics-public-data/cwl-examples/gdc-dnaseq-cwl/workflows/dnaseq/transform.cwl \
+  --settings-file gs://genomics-public-data/cwl-examples/gdc-dnaseq-cwl/input/gdc-dnaseq-input.json \
+  --input-recursive gs://genomics-public-data/cwl-examples/gdc-dnaseq-cwl \
   --output gs://MY-BUCKET/MY-PATH \
   --machine-type n1-standard-4
 ```
@@ -69,35 +70,46 @@ Here's some more information about what's happening:
 
 ## Monitoring your workflow
 
-To monitor your job from the cloud console, go to:
+Once your job starts, it will have an `OPERATION-ID` assigned, which you can use to check status and find the VM and disk in your cloud project.
 
+To monitor your job, check the status to see if it's RUNNING, COMPLETED, or FAILED:
+```
+gsutil cat gs://MY-BUCKET/MY-PATH/status-OPERATION-ID.txt
+```
+
+While your job is running, you can see the VM in the cloud console and command-line.
+When the job completes, the VM will no longer be found unless --keep-alive is set.
+
+Cloud console:
 ```
 https://console.cloud.google.com/compute/instances
 ```
 
-To monitor your job from the command-line, run:
-
+Command-line:  
 ```
-gcloud compute instances describe cwl-vm-14011 
+gcloud compute instances describe cwl-vm-OPERATION-ID
 ```
 
-While your VM is running, you can describe it. 
-When the workflow completes, the VM will no longer be found.
+## Canceling a job
 
-## Troubleshooting
+To cancel a running job, you can terminate the VM from the cloud console or command-line:
+```
+gcloud compute instances delete cwl-vm-OPERATION-ID
+```
+
+## Debugging a job
 
 To debug a failed run, look at the log files in your output directory. 
-From the cloud console, go to:
 
+Cloud console:
 ```
 https://console.cloud.google.com/storage/browser
 ```
 
-From the command-line:
-
+Command-line:
 ```
-gsutil cat gs://jbingham-scratch/cwl/output/stderr-14011.txt | less
-gsutil cat gs://jbingham-scratch/cwl/output/stdout-14011.txt | less
+gsutil cat gs://MY-BUCKET/MY-PATH/stderr-OPERATION-ID.txt | less
+gsutil cat gs://MY-BUCKET/MY-PATH/stdout-OPERATION-ID.txt | less
 ```
 
 For additional debugging, you can rerun this script with --keep-alive and ssh into the VM.

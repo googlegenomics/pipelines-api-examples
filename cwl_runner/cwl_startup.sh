@@ -141,8 +141,6 @@ if [[ ${RUNNER} == "cwltool" ]]; then
 
 elif [[ ${RUNNER} == "rabix" ]]
 then
-  echo "$(date)"
-  echo "Installing Docker and CWL runner"
   sudo apt-get --yes install openjdk-8-jre
   sudo apt-get update
   sudo apt-get --yes install apt-utils docker.io gcc ca-certificates
