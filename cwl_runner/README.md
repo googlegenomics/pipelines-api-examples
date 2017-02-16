@@ -2,16 +2,16 @@
 
 ## This example demonstrates running a multi-stage workflow on Google Cloud Platform
 
-* The workflow is launched with a bash script that calls the [Google Cloud SDK](https://cloud.google.com/sdk)
+* The workflow is launched with a bash script, [cwl_runner.sh](cwl_runner.sh), that calls the gcloud command-line tool that is included in the [Google Cloud SDK](https://cloud.google.com/sdk)
 * The workflow is defined using the [Common Workflow Language (CWL)](http://www.commonwl.org)
-* The workflow stages are orchestrated using [cwltool](https://github.com/common-workflow-language/cwltool/tree/master/cwltool)
+* The workflow stages are orchestrated using [cwltool](https://github.com/common-workflow-language/cwltool/tree/master/cwltool) or [rabix](https://github.com/rabix/bunny).
 
-Here's what the bash script does to run a CWL workflow:
+To run a CWL workflow, `cwl_runner.sh` will:
 1. Create a disk
 1. Create a Compute Engine VM with that disk
 1. Run a startup script on the VM
 
-The startup script running on the VM will:
+The startup script, [cwl_startup.sh](cwl_startup.sh), will run on the VM and:
 1. Mount and format the disk
 1. Download input files from Google Cloud Storage
 1. Install Docker
@@ -21,18 +21,18 @@ The startup script running on the VM will:
 1. Copy stdout and stderr logs to Google Cloud Storage
 1. Shutdown and delete the VM and disk
 
-__Note that the CWL runner does not use the Pipelines API. If you don't have enough quota, the script will fail; it won't be queued to run when quota is available.__
+__Note that the CWL runner does not use the [Pipelines API](https://cloud.google.com/genomics/reference/rest/v1alpha2/pipelines). If you don't have enough quota, the script will fail; it won't be queued to run when quota is available.__
 
 ## Prerequisites
 
-1. Download the one required file, `cwl_runner.sh`, or, if you prefer, clone or fork this github repository.
+1. Download the required script files, `cwl_runner.sh`, `cwl_startup.sh` and `cwl_shutdown.sh`, or, if you prefer, clone or fork this github repository.
 1. Enable the Genomics, Cloud Storage, and Compute Engine APIs on a new or existing Google Cloud Project using the [Cloud Console](https://console.cloud.google.com/flows/enableapi?apiid=storage_component,compute_component&redirect=https://console.cloud.google.com)
 1. Install and initialize the [Google Cloud SDK](https://cloud.google.com/sdk).
 1. Follow the Cloud Storage instructions for [Creating Storage Buckets](https://cloud.google.com/storage/docs/creating-buckets) to create a bucket to store workflow output and logging
 
 ## Running a sample workflow in the cloud
 
-This script can (in theory!) run any CWL workflow.
+This script should be able to support any CWL workflow supported by cwltool.
 
 You can run the script with `--help` to see all of the command-line options.
 
@@ -42,7 +42,13 @@ You can run the script with `--help` to see all of the command-line options.
 
 As an example, let's run a real workflow from the [Genome Data Commons](https://gdc.cancer.gov) stored in a [GDC github project](https://github.com/nci-gdc/gdc-dnaseq-cwl).
 
-This particular workflow requires a reference genome bundle, a DNA reads file in BAM format, and several CWL tool definitions. All of those files have already been copied into a Cloud Storage bucket, so we can just reference them when we run the CWL workflow.
+This particular workflow requires:
+
+* a reference genome bundle
+* a DNA reads file in BAM format
+* several CWL tool definitions
+
+All of the required files have already been copied into Google Cloud Storage (at gs://genomics-public-data/cwl-examples/gdc-dnaseq-cwl), so we can just reference them when we run the CWL workflow.
 
 Here's an example command-line:
 
@@ -77,15 +83,8 @@ To monitor your job, check the status to see if it's RUNNING, COMPLETED, or FAIL
 gsutil cat gs://MY-BUCKET/MY-PATH/status-OPERATION-ID.txt
 ```
 
-While your job is running, you can see the VM in the cloud console and command-line.
-When the job completes, the VM will no longer be found unless --keep-alive is set.
+While your job is running, you can see the VM in the [Cloud Console](https://console.cloud.google.com/compute/instances) and command-line. When the job completes, the VM will no longer be found unless `--keep-alive` is set. Command-line:  
 
-Cloud console:
-```
-https://console.cloud.google.com/compute/instances
-```
-
-Command-line:  
 ```
 gcloud compute instances describe cwl-vm-OPERATION-ID
 ```
