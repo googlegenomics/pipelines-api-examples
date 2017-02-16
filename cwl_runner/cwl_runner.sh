@@ -152,6 +152,7 @@ readonly STATUS="STARTING"
 
 readonly VM_NAME="cwl-vm-${OPERATION_ID}"
 readonly VM_CMD="gcloud compute instances create ${VM_NAME} \
+<<<<<<< HEAD
 --disk name=${DISK_NAME},device-name=${DISK_NAME},auto-delete=yes \
 --machine-type ${MACHINE_TYPE} \
 --scopes storage-rw,compute-rw \
@@ -169,6 +170,25 @@ output=${OUTPUT},\
 runner=${RUNNER},\
 status-file=${STATUS_FILE},\
 keep-alive=${KEEP_ALIVE}"
+=======
+    --disk name=${DISK_NAME},device-name=${DISK_NAME},auto-delete=yes \
+    --machine-type ${MACHINE_TYPE} \
+    --scopes storage-rw,compute-rw \
+    ${ZONE} \
+    ${PREEMPTIBLE} \
+    --metadata \
+    startup-script-url=${STARTUP_SCRIPT_URL},\
+    shutdown-script-url=${SHUTDOWN_SCRIPT_URL},\
+    operation-id=${OPERATION_ID},\
+    workflow-file=${WORKFLOW_FILE},\
+    settings-file=${SETTINGS_FILE},\
+    input=\"${INPUT}\",\
+    input-recursive=\"${INPUT_RECURSIVE}\",\
+    output=${OUTPUT},\
+    runner=${RUNNER},\
+    status-file=${STATUS_FILE},\
+    keep-alive=${KEEP_ALIVE}"
+>>>>>>> b11879abf0fe92c1053f2c0e84678da4397a8bd0
 
 echo $(date)
 echo "Generating script commands and writing to file"
