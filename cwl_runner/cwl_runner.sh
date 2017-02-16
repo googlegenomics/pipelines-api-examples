@@ -19,18 +19,18 @@
 # From your shell prompt, launch a Google Compute Engine VM to run
 # a Common Workflow Language (CWL) workflow with cwltool.
 
-WORKFLOW_PATH=
-SETTINGS_PATH=
-INPUT=
-INPUT_RECURSIVE=
-OUTPUT=
-KEEP_ALIVE=
-DISK_SIZE=200
-MACHINE_TYPE="n1-standard-1"
-PREEMPTIBLE=
-RUNNER="cwltool"
-ZONE=
-OPERATION_ID=$$
+declare WORKFLOW_PATH=
+declare SETTINGS_PATH=
+declare INPUT=
+declare INPUT_RECURSIVE=
+declare OUTPUT=
+declare KEEP_ALIVE=
+declare DISK_SIZE=200
+declare MACHINE_TYPE="n1-standard-1"
+declare PREEMPTIBLE=
+declare RUNNER="cwltool"
+declare ZONE=
+declare OPERATION_ID=$$
 
 read -r -d '' HELP_MESSAGE << EOM
 
@@ -68,65 +68,65 @@ Other options:
 EOM
 
 # Parse command-line
-while [[ $# -gt 0 ]] 
-do
-key="$1"
+while [[ $# -gt 0 ]]; do
+  key="$1"
 
-case $key in
-  -h|--help)
-  echo "${HELP_MESSAGE}"
-  exit 1
-  ;;
-  -w|--workflow-file)
-  WORKFLOW_FILE="$2"
+  case $key in
+    -h|--help)
+    echo "${HELP_MESSAGE}"
+    exit 1
+    ;;
+    -w|--workflow-file)
+    WORKFLOW_FILE="$2"
+    shift
+    ;;
+    -s|--settings-file)
+    SETTINGS_FILE="$2"
+    shift
+    ;;
+    -i|--input)
+    INPUT="$2"
+    shift
+    ;;
+    -r|--input-recursive)
+    INPUT_RECURSIVE="$2"
+    shift
+    ;;
+    -o|--output)
+    OUTPUT="$2"
+    shift
+    ;;
+    -d|--disk-size)
+    DISK_SIZE="$2"
+    shift
+    ;;
+    -k|--keep-alive)
+    KEEP_ALIVE="true"
+    ;;
+    -m|--machine-type)
+    MACHINE_TYPE="$2"
+    shift
+    ;;
+    -p|--preemptible)
+    PREEMPTIBLE="--preemptible"
+    ;;
+    -z|--zone)
+    ZONE="--zone $2"
+    shift
+    ;;
+    -r|--runner)
+    RUNNER="$2"
+    shift
+    ;;
+    *)
+    # unknown option
+    ;;
+  esac
   shift
-  ;;
-  -s|--settings-file)
-  SETTINGS_FILE="$2"
-  shift
-  ;;
-  -i|--input)
-  INPUT="$2"
-  shift
-  ;;
-  -r|--input-recursive)
-  INPUT_RECURSIVE="$2"
-  shift
-  ;;
-  -o|--output)
-  OUTPUT="$2"
-  shift
-  ;;
-  -d|--disk-size)
-  DISK_SIZE="$2"
-  shift
-  ;;
-  -k|--keep-alive)
-  KEEP_ALIVE="true"
-  ;;
-  -m|--machine-type)
-  MACHINE_TYPE="$2"
-  shift
-  ;;
-  -p|--preemptible)
-  PREEMPTIBLE="--preemptible"
-  ;;
-  -z|--zone)
-  ZONE="--zone $2"
-  shift
-  ;;
-  -r|--runner)
-  RUNNER="$2"
-  shift
-  ;;
-  *)
-  # unknown option
-  ;;
-esac
-shift
 done
 
-set -e errexit
+set -o errexit
+#set -o nounset
 
 if [[ -z "${WORKFLOW_FILE}" || -z "${SETTINGS_FILE}" || -z "${OUTPUT}" ]]; then
   echo "Error: Missing required argument(s)."
@@ -134,48 +134,50 @@ if [[ -z "${WORKFLOW_FILE}" || -z "${SETTINGS_FILE}" || -z "${OUTPUT}" ]]; then
   exit 1
 fi
 
-DISK_NAME="cwl-disk-${OPERATION_ID}"
-DISK_CMD="gcloud compute disks create ${DISK_NAME} ${ZONE} --size ${DISK_SIZE}"
+readonly DISK_NAME="cwl-disk-${OPERATION_ID}"
+readonly DISK_CMD="gcloud compute disks create ${DISK_NAME} ${ZONE} --size ${DISK_SIZE}"
 
-PWD="$( cd $( dirname ${BASH_SOURCE[0]} ) && pwd )"
+readonly SCRIPT_DIR="$( cd $( dirname ${BASH_SOURCE[0]} ) && pwd )"
 
-STARTUP_SCRIPT_NAME="cwl_startup.sh"
-STARTUP_SCRIPT="${PWD}/${STARTUP_SCRIPT_NAME}"
-STARTUP_SCRIPT_URL="${OUTPUT}/${STARTUP_SCRIPT_NAME%.*}-${OPERATION_ID}.sh"
+readonly STARTUP_SCRIPT_NAME="cwl_startup.sh"
+readonly STARTUP_SCRIPT="${SCRIPT_DIR}/${STARTUP_SCRIPT_NAME}"
+readonly STARTUP_SCRIPT_URL="${OUTPUT}/${STARTUP_SCRIPT_NAME%.*}-${OPERATION_ID}.sh"
 
-SHUTDOWN_SCRIPT_NAME="cwl_shutdown.sh"
-SHUTDOWN_SCRIPT="${PWD}/${SHUTDOWN_SCRIPT_NAME}"
-SHUTDOWN_SCRIPT_URL="${OUTPUT}/${SHUTDOWN_SCRIPT_NAME%.*}-${OPERATION_ID}.sh"
+readonly SHUTDOWN_SCRIPT_NAME="cwl_shutdown.sh"
+readonly SHUTDOWN_SCRIPT="${SCRIPT_DIR}/${SHUTDOWN_SCRIPT_NAME}"
+readonly SHUTDOWN_SCRIPT_URL="${OUTPUT}/${SHUTDOWN_SCRIPT_NAME%.*}-${OPERATION_ID}.sh"
 
-STATUS_FILE="${OUTPUT}/status-${OPERATION_ID}.txt"
-STATUS="STARTING"
+readonly STATUS_FILE="${OUTPUT}/status-${OPERATION_ID}.txt"
+readonly STATUS="STARTING"
 
-VM_NAME="cwl-vm-${OPERATION_ID}"
-VM_CMD="gcloud compute instances create ${VM_NAME} \
---disk name=${DISK_NAME},device-name=${DISK_NAME},auto-delete=yes \
---machine-type ${MACHINE_TYPE} \
---scopes storage-rw,compute-rw \
-${ZONE} \
-${PREEMPTIBLE} \
---metadata \
-startup-script-url=${STARTUP_SCRIPT_URL},\
-shutdown-script-url=${SHUTDOWN_SCRIPT_URL},\
-operation-id=${OPERATION_ID},\
-workflow-file=${WORKFLOW_FILE},\
-settings-file=${SETTINGS_FILE},\
-input=\"${INPUT}\",\
-input-recursive=\"${INPUT_RECURSIVE}\",\
-output=${OUTPUT},\
-runner=${RUNNER},\
-status-file=${STATUS_FILE},\
-keep-alive=${KEEP_ALIVE}"
+readonly VM_NAME="cwl-vm-${OPERATION_ID}"
+readonly VM_CMD="gcloud compute instances create ${VM_NAME} \
+    --disk name=${DISK_NAME},device-name=${DISK_NAME},auto-delete=yes \
+    --machine-type ${MACHINE_TYPE} \
+    --scopes storage-rw,compute-rw \
+    ${ZONE} \
+    ${PREEMPTIBLE} \
+    --metadata \
+    startup-script-url=${STARTUP_SCRIPT_URL},\
+    shutdown-script-url=${SHUTDOWN_SCRIPT_URL},\
+    operation-id=${OPERATION_ID},\
+    workflow-file=${WORKFLOW_FILE},\
+    settings-file=${SETTINGS_FILE},\
+    input=\"${INPUT}\",\
+    input-recursive=\"${INPUT_RECURSIVE}\",\
+    output=${OUTPUT},\
+    runner=${RUNNER},\
+    status-file=${STATUS_FILE},\
+    keep-alive=${KEEP_ALIVE}"
 
 echo $(date)
 echo "Generating script commands and writing to file"
-TMP_SCRIPT=".$(basename ${0%.*} )-${OPERATION_ID}.sh"
-echo "#!/bin/bash" > "${TMP_SCRIPT}"
-echo "$DISK_CMD" >> "${TMP_SCRIPT}"
-echo "$VM_CMD" >> "${TMP_SCRIPT}"
+readonly TMP_SCRIPT=".$(basename ${0%.*} )-${OPERATION_ID}.sh"
+cat > "${TMP_SCRIPT}" << EOF
+#!/bin/bash
+"${DISK_CMD}"
+"${VM_CMD}"
+EOF
 
 echo "Copying scripts to the output path in Cloud Storage"
 gsutil cp "${STARTUP_SCRIPT}" "${STARTUP_SCRIPT_URL}"
@@ -184,18 +186,18 @@ gsutil cp "${TMP_SCRIPT}" "${OUTPUT}/${TMP_SCRIPT/./}"
 rm "${TMP_SCRIPT}"
 
 echo "Creating Google Compute Engine VM and disk"
-echo $DISK_CMD
-$DISK_CMD
+echo "${DISK_CMD}"
+${DISK_CMD}
 
-echo $VM_CMD
-$VM_CMD
+echo "${VM_CMD}"
+${VM_CMD}
 
 cat << EOM
 
 Congratulations! Your job is running.
 
 To monitor your job, check the status to see if it's RUNNING, COMPLETED, or FAILED:
-gsutil cat ${STATUS_FILE}
+gsutil cat "${STATUS_FILE}"
 
 While your job is running, you can see the VM in the cloud console and command-line.
 When the job completes, the VM will no longer be found unless --keep-alive is set.
@@ -215,8 +217,8 @@ Cloud console:
 https://console.cloud.google.com/storage/browser/${OUTPUT/gs:\/\//}
 
 Command-line:
-gsutil cat ${OUTPUT}/stderr-${OPERATION_ID}.txt | less
-gsutil cat ${OUTPUT}/stdout-${OPERATION_ID}.txt | less
+gsutil cat "${OUTPUT}/stderr-${OPERATION_ID}.txt" | less
+gsutil cat "${OUTPUT}/stdout-${OPERATION_ID}.txt" | less
 
 For additional debugging, you can rerun this script with --keep-alive and ssh into the VM.
 If you use --keep-alive, you will need to manually delete the VM to avoid charges.
