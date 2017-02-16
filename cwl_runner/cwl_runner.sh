@@ -30,7 +30,7 @@ declare MACHINE_TYPE="n1-standard-1"
 declare PREEMPTIBLE=
 declare RUNNER="cwltool"
 declare ZONE=
-declare OPERATION_ID=$$
+readonly OPERATION_ID=$$
 
 read -r -d '' HELP_MESSAGE << EOM
 
@@ -72,9 +72,9 @@ set -o nounset
 
 # Parse command-line
 while [[ $# -gt 0 ]]; do
-  key="$1"
+  KEY="$1"
 
-  case $key in
+  case ${KEY} in
     -h|--help)
     echo "${HELP_MESSAGE}"
     exit 1
