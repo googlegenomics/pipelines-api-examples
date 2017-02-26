@@ -141,11 +141,11 @@ class CromwellDriver(object):
       status = status_json['status']
       if status == 'Succeeded':
         break
-      elif status == 'Running':
+      elif status == 'Submitted' or status == 'Running':
         pass
       else:
         sys_util.exit_with_error(
-            "Status of job is not Running or Succeeded: %s" % status)
+            "Status of job is not Submitted or Running or Succeeded: %s" % status)
 
     logging.info("Cromwell job status: %s", status)
 
