@@ -34,6 +34,9 @@ RUN apt-get update && \
 # Install Python "requests" (for cromwell_driver.py) package
 RUN pip install requests
 
+# Install Python "simplejson" (for file_util.py) package
+RUN pip install simplejson
+
 # Install Google Python client (for file_util.py) package
 RUN pip install --upgrade google-api-python-client
 
@@ -56,8 +59,8 @@ RUN chmod u+x /wdl_runner/wdl_runner.sh
 # Copy Cromwell and the Cromwell conf template
 RUN mkdir /cromwell
 RUN cd /cromwell && \
-    curl -L -O https://github.com/broadinstitute/cromwell/releases/download/0.19.3/cromwell-0.19.3.jar
-RUN ln /cromwell/cromwell-0.19.3.jar /cromwell/cromwell.jar
+    curl -L -O https://github.com/broadinstitute/cromwell/releases/download/24/cromwell-24.jar
+RUN ln /cromwell/cromwell-24.jar /cromwell/cromwell.jar
 COPY jes_template.conf /cromwell/
 
 # Set up the runtime environment
