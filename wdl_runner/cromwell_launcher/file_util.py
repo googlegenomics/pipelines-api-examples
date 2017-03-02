@@ -76,7 +76,8 @@ def verify_gcs_dir_empty_or_missing(path):
 
   # Get the storage endpoint
   credentials = GoogleCredentials.get_application_default()
-  service = discovery.build('storage', 'v1', credentials=credentials)
+  service = discovery.build('storage', 'v1', credentials=credentials,
+                            cache_discovery=False)
 
   # Build the request - only need the name
   fields = 'nextPageToken,items(name)'

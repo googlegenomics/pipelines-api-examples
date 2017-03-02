@@ -21,7 +21,7 @@ Execution of a running Pipeline proceeds as:
 
 1. Create Compute Engine virtual machine
 
-2. Execute wdl_runner.py
+2. On the VM, in a Docker container, execute wdl_runner.py
 
     a. Run Cromwell (server)
 
@@ -33,8 +33,7 @@ Execution of a running Pipeline proceeds as:
         2) Poll for completion of call 1
         3) Call pipelines.run() to execute call 2
         4) Poll for completion of call 2
-        5) Call pipelines.run() to execute call 3
-        6) Poll for completion of call 3
+        <etc. until all WDL "calls" complete>
 
     d. Copy workflow metadata to output path
 
@@ -56,7 +55,7 @@ The code in the wdl_runner Docker image includes:
 
 * [OpenJDK 8](http://openjdk.java.net/projects/jdk8/) runtime engine (JRE)
 * [Python 2.7](https://www.python.org/download/releases/2.7/) interpreter
-* [Cromwell release 0.19.3](https://github.com/broadinstitute/cromwell/releases/tag/0.19.3)
+* [Cromwell release 24](https://github.com/broadinstitute/cromwell/releases/tag/24)
 * [Python and shell scripts from this repository](./src)
 
 Take a look at the [Dockerfile](./cromwell_launcher/Dockerfile) for full details.
