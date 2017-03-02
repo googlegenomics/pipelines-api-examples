@@ -7,11 +7,13 @@
 * The workflow stages are orchestrated using [cwltool](https://github.com/common-workflow-language/cwltool/tree/master/cwltool) or [rabix](https://github.com/rabix/bunny).
 
 To run a CWL workflow, `cwl_runner.sh` will:
+
 1. Create a disk
 1. Create a Compute Engine VM with that disk
 1. Run a startup script on the VM
 
 The startup script, [cwl_startup.sh](cwl_startup.sh), will run on the VM and:
+
 1. Mount and format the disk
 1. Download input files from Google Cloud Storage
 1. Install Docker
