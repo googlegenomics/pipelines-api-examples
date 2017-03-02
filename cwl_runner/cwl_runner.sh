@@ -148,7 +148,6 @@ readonly SHUTDOWN_SCRIPT="${SCRIPT_DIR}/${SHUTDOWN_SCRIPT_NAME}"
 readonly SHUTDOWN_SCRIPT_URL="${OUTPUT}/${SHUTDOWN_SCRIPT_NAME%.*}-${OPERATION_ID}.sh"
 
 readonly STATUS_FILE="${OUTPUT}/status-${OPERATION_ID}.txt"
-readonly STATUS="STARTING"
 
 readonly VM_NAME="cwl-vm-${OPERATION_ID}"
 readonly VM_CMD="gcloud compute instances create ${VM_NAME} \
@@ -175,8 +174,8 @@ echo "Generating script commands and writing to file"
 readonly TMP_SCRIPT=".$(basename ${0%.*} )-${OPERATION_ID}.sh"
 cat > "${TMP_SCRIPT}" << EOF
 #!/bin/bash
-"${DISK_CMD}"
-"${VM_CMD}"
+${DISK_CMD}
+${VM_CMD}
 EOF
 
 echo "Copying scripts to the output path in Cloud Storage"
