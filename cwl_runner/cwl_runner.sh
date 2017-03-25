@@ -129,8 +129,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "${WORKFLOW_FILE}" || -z "${SETTINGS_FILE}" || -z "${OUTPUT}" ]]; then
-  echo "Error: Missing required argument(s)."
-  echo "${HELP_MESSAGE}"
+  >&2 echo "Error: Wrkflow file, settings file, and output are required."
   exit 1
 fi
 
@@ -169,29 +168,32 @@ runner=${RUNNER},\
 status-file=${STATUS_FILE},\
 keep-alive=${KEEP_ALIVE}"
 
-echo $(date)
-echo "Generating script commands and writing to file"
+>&2 echo $(date)
+>&2 echo "Generating script commands and writing to file"
 readonly TMP_SCRIPT=".$(basename ${0%.*} )-${OPERATION_ID}.sh"
 cat > "${TMP_SCRIPT}" << EOF
 #!/bin/bash
-${DISK_CMD}
-${VM_CMD}
+>&2 ${DISK_CMD}
+>&2 ${VM_CMD}
+echo ${OPERATION_ID}
 EOF
 
-echo "Copying scripts to the output path in Cloud Storage"
+>&2 echo "Copying scripts to the output path in Cloud Storage"
 gsutil cp "${STARTUP_SCRIPT}" "${STARTUP_SCRIPT_URL}"
 gsutil cp "${SHUTDOWN_SCRIPT}" "${SHUTDOWN_SCRIPT_URL}"
 gsutil cp "${TMP_SCRIPT}" "${OUTPUT}/${TMP_SCRIPT/./}"
 rm "${TMP_SCRIPT}"
 
-echo "Creating Google Compute Engine VM and disk"
-echo "${DISK_CMD}"
-${DISK_CMD}
+>&2 echo "Creating Google Compute Engine VM and disk"
+>&2 echo "${DISK_CMD}"
+>&2 ${DISK_CMD}
 
-echo "${VM_CMD}"
-${VM_CMD}
+>&2 echo "${VM_CMD}"
+>&2 ${VM_CMD}
 
-cat << EOM
+echo ${OPERATION_ID}
+
+>&2 cat << EOM
 
 Congratulations! Your job is running.
 
