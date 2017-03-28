@@ -129,7 +129,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "${WORKFLOW_FILE}" || -z "${SETTINGS_FILE}" || -z "${OUTPUT}" ]]; then
-  >&2 echo "Error: Wrkflow file, settings file, and output are required."
+  >&2 echo "Error: Workflow file, settings file, and output are required."
   exit 1
 fi
 
