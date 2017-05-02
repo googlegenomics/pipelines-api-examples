@@ -21,4 +21,4 @@ docker:
     /wdl_runner/wdl_runner.sh
 
 resources:
-  minimumRamGb: 1
+  minimumRamGb: 3.75
