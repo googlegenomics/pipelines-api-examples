@@ -31,7 +31,7 @@ set -o errexit
 readonly DOCKER_IMAGE=${USER}/samtools
 
 # Use the smallest BAM file in the 1000genomes data (26534 bytes)
-readonly TEST_INPUT_URI=ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06986/alignment/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam
+readonly TEST_INPUT_URI=http://storage.googleapis.com/genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06986/alignment/NA06986.chromMT.ILLUMINA.bwa.CEU.exon_targetted.20100311.bam
 
 readonly TEST_INPUT_FILENAME=$(basename ${TEST_INPUT_URI})
 readonly TEST_OUTPUT_FILENAME=${TEST_INPUT_FILENAME/%.bam/.sam}
