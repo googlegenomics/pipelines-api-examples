@@ -1,12 +1,10 @@
 #!/usr/bin/env Rscript
 
-# Copyright 2016 Google Inc. All rights reserved.
+# Copyright 2017 Google Inc.
 #
-# Licensed under the Apache License, Version 2.0 (the 'License');
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file or at
+# https://developers.google.com/open-source/licenses/bsd
 
 # This example is adapted from Bioconductor Vignette:
 #   https://bioconductor.org/packages/release/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.pdf
