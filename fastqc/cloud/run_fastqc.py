@@ -111,9 +111,10 @@ operation = service.pipelines().run(body={
       } ],
     },
 
-    # Specify the Docker image to use along with the command
+    # Specify the Docker image to use along with the command. Projects IDs with a
+    # colon (:) must swap it for a forward slash when specifying image names.
     'docker': {
-      'imageName': 'gcr.io/%s/fastqc' % args.project,
+      'imageName': 'gcr.io/%s/fastqc' % args.project.replace(':', '/'),
 
       # The Pipelines API will create the input directory when localizing files,
       # but does not create the output directory.

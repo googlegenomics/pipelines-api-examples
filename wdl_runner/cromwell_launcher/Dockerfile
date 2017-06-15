@@ -48,8 +48,8 @@ RUN chmod u+x /wdl_runner/wdl_runner.sh
 # Copy Cromwell and the Cromwell conf template
 RUN mkdir /cromwell
 RUN cd /cromwell && \
-    curl -L -O https://github.com/broadinstitute/cromwell/releases/download/24/cromwell-24.jar
-RUN ln /cromwell/cromwell-24.jar /cromwell/cromwell.jar
+    curl -L -O https://github.com/broadinstitute/cromwell/releases/download/27/cromwell-27.jar
+RUN ln /cromwell/cromwell-27.jar /cromwell/cromwell.jar
 COPY jes_template.conf /cromwell/
 
 # Set up the runtime environment
