@@ -55,7 +55,7 @@ The code in the wdl_runner Docker image includes:
 
 * [OpenJDK 8](http://openjdk.java.net/projects/jdk8/) runtime engine (JRE)
 * [Python 2.7](https://www.python.org/download/releases/2.7/) interpreter
-* [Cromwell release 24](https://github.com/broadinstitute/cromwell/releases/tag/24)
+* [Cromwell release 27](https://github.com/broadinstitute/cromwell/releases/tag/27)
 * [Python and shell scripts from this repository](./src)
 
 Take a look at the [Dockerfile](./cromwell_launcher/Dockerfile) for full details.
