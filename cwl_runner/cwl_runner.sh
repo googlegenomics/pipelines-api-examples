@@ -83,7 +83,7 @@ while [[ $# -gt 0 ]]; do
     INPUT="$2"
     shift
     ;;
-    -r|--input-recursive)
+    -I|--input-recursive)
     INPUT_RECURSIVE="$2"
     shift
     ;;
