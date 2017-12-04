@@ -1,4 +1,0 @@
-{
-  "vcf_chr_count.vcf_file": "gs://genomics-public-data/platinum-genomes/vcf/NA12877_S1.genome.vcf",
-  "vcf_chr_count.chrList": "chrM,chrX,chrY"
-}
